@@ -1,6 +1,13 @@
 <script lang="ts">
-	import '../app.css';
-	let { children } = $props();
+  import { Toaster } from "$lib/components/ui/sonner/index";
+  import "../app.css";
+  let { children } = $props();
 </script>
 
-{@render children()}
+<Toaster closeButton richColors />
+
+<main>
+  <div class="px-5 pt-6">
+    {@render children()}
+  </div>
+</main>
