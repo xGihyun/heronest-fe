@@ -1,4 +1,4 @@
-import { UserRole, UserSex } from "$lib/users/types";
+import { UserRole, UserSex } from "$lib/user/types";
 import * as v from "valibot";
 
 export const registerSchema = v.object({

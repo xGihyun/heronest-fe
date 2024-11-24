@@ -11,7 +11,7 @@
     superForm
   } from "sveltekit-superforms";
   import { valibotClient } from "sveltekit-superforms/adapters";
-  import { UserRole, UserSex } from "$lib/users/types";
+  import { UserRole, UserSex } from "$lib/user/types";
   import type { SelectOption } from "$lib/types";
   import {
     CalendarDate,

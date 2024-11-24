@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+	@font-face {
+		font-family: 'inter';
+		font-display: swap;
+		src: url('/fonts/inter/Inter-Regular.ttf');
+	}
+
+	@font-face {
+		font-family: 'inter-medium';
+		font-display: swap;
+		src: url('/fonts/inter/Inter-Medium.ttf');
+	}
+
+	@font-face {
+		font-family: 'inter-bold';
+		font-display: swap;
+		src: url('/fonts/inter/Inter-Bold.ttf');
+	}
+
+	html {
+		font-family: "inter", system-ui, sans-serif;
+	}
+
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;
