@@ -2,6 +2,7 @@
   "name": "heronest",
   "version": "0.0.1",
   "devDependencies": {
+    "@iconify/json": "^2.2.275",
     "@internationalized/date": "^3.6.0",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
@@ -30,6 +31,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.0.0",
+    "unplugin-icons": "^0.20.1",
     "valibot": "^1.0.0-beta.8",
     "vite": "^5.0.3"
   },
@@ -44,6 +46,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@tanstack/table-core": "^8.20.5",
     "konva": "^9.3.16"
   }
 }

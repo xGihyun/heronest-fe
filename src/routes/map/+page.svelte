@@ -4,9 +4,11 @@
 	import { onMount } from "svelte";
 	import { loadFromSvg } from "$lib/map/utils";
 	import { handleWheel } from "$lib/map/handlers";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
 
-	import MapPinIcon from "lucide-svelte/icons/map-pin";
+	import { ArrowDownDropIcon, LocationIcon } from "$lib/icons";
 
+	const MAP_PADDING = 240;
 	let mapContainer: HTMLDivElement | undefined;
 
 	onMount(async () => {
@@ -58,8 +60,8 @@
 		const mapBackground = new Konva.Rect({
 			x: 0,
 			y: 0,
-			width: seatsBox.width + 50,
-			height: seatsBox.height + 50,
+			width: seatsBox.width + MAP_PADDING,
+			height: seatsBox.height + MAP_PADDING,
 			fill: "#333333",
 			stroke: "#BBBBBB",
 			strokeWidth: 4
@@ -70,7 +72,7 @@
 
 		const mapGroup = new Konva.Group();
 
-		//mapGroup.add(mapBackground)
+		mapGroup.add(mapBackground);
 		mapGroup.add(seatsGroup);
 
 		layer.add(mapGroup);
@@ -84,14 +86,14 @@
 		};
 
 		seatsGroup.position({
-			x: stageCenter.x - seatsBox.width / 2 - seatsBox.x,
-			y: stageCenter.y - seatsBox.height / 2 - seatsBox.y
+			x: (seatsBox.width + MAP_PADDING - seatsBox.width) / 2,
+			y: (seatsBox.height + MAP_PADDING - seatsBox.height) / 2
 		});
 
-		//mapGroup.position({
-		//	x: stageCenter.x - mapRect.width / 2 - mapRect.x,
-		//	y: stageCenter.y - mapRect.height / 2 - mapRect.y
-		//});
+		mapGroup.position({
+			x: stageCenter.x - mapRect.width / 2 - mapRect.x,
+			y: stageCenter.y - mapRect.height / 2 - mapRect.y
+		});
 
 		stage.batchDraw();
 
@@ -108,16 +110,18 @@
 </script>
 
 <div class="relative h-[100svh] w-full">
-	<div
+	<button
 		class="absolute left-1/2 top-10 z-50 flex -translate-x-1/2
-		items-center gap-2 rounded-md border bg-background px-4 py-3 shadow"
+		items-center gap-2 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-4 py-3
+		shadow text-background"
 	>
-		<MapPinIcon />
-		<span class="font-inter-medium"> Performing Arts Theather </span>
-	</div>
+		<LocationIcon class="size-6 text-accent" />
+		<span class="font-inter-medium text-background/80"> Performing Arts Theather </span>
+		<ArrowDownDropIcon class="size-6" />
+	</button>
 
 	<div
 		bind:this={mapContainer}
-		class="relative z-40 h-full w-full bg-neutral-200 rounded-lg"
+		class="relative z-40 h-full w-full rounded-lg bg-neutral-200"
 	></div>
 </div>

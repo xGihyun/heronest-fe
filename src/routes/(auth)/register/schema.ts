@@ -1,7 +1,7 @@
 import { UserRole, UserSex } from "$lib/user/types";
 import * as v from "valibot";
 
-export const registerSchema = v.object({
+export const RegisterSchema = v.object({
   email: v.pipe(v.string(), v.email()),
   password: v.pipe(v.string(), v.nonEmpty("Password is required.")),
   role: v.enum(UserRole),
@@ -13,5 +13,3 @@ export const registerSchema = v.object({
   birth_date: v.pipe(v.date(), v.toMinValue(new Date())),
   sex: v.enum(UserSex)
 });
-
-export type RegisterSchema = typeof registerSchema

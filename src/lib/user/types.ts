@@ -9,3 +9,9 @@ export enum UserSex {
   Male = "male",
   Female = "female"
 }
+
+export type User = {
+  user_id: string;
+  email: string;
+  role: UserRole;
+}

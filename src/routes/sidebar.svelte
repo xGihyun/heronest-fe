@@ -1,36 +1,47 @@
 <script lang="ts">
-	import Calendar from "lucide-svelte/icons/calendar";
-	import House from "lucide-svelte/icons/house";
-	import MapPinned from "lucide-svelte/icons/map-pinned";
-	import Users from "lucide-svelte/icons/users";
-	import Settings from "lucide-svelte/icons/settings";
+	import { page } from "$app/stores";
 	import * as Sidebar from "$lib/components/ui/sidebar";
+	import {
+		EventIcon,
+		HomeIcon,
+		LocationIcon,
+		MapIcon,
+		UsersIcon
+	} from "$lib/icons";
+	import type { Component } from "svelte";
+	import type { SVGAttributes } from "svelte/elements";
 
-	const items = [
+	type Route = {
+		name: string;
+		path: string;
+		icon: Component<SVGAttributes<SVGSVGElement>>
+	}
+
+	const ROUTES: Route[] = [
 		{
-			title: "Home",
-			url: "/",
-			icon: House
+			name: "Home",
+			path: "/",
+			icon: HomeIcon
 		},
 		{
-			title: "Map",
-			url: "/map",
-			icon: MapPinned
+			name: "Map",
+			path: "/map",
+			icon: MapIcon
 		},
 		{
-			title: "Events",
-			url: "/events",
-			icon: Calendar
+			name: "Events",
+			path: "/events",
+			icon: EventIcon
 		},
 		{
-			title: "Users",
-			url: "/users",
-			icon: Users
+			name: "Venues",
+			path: "/venues",
+			icon: LocationIcon
 		},
 		{
-			title: "Settings",
-			url: "#",
-			icon: Settings
+			name: "Users",
+			path: "/users",
+			icon: UsersIcon
 		}
 	];
 </script>
@@ -45,13 +56,13 @@
 			<Sidebar.GroupLabel>Application</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
 				<Sidebar.Menu>
-					{#each items as item (item.title)}
+					{#each ROUTES as route (route.name)}
 						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
+							<Sidebar.MenuButton isActive={route.path === $page.url.pathname}>
 								{#snippet child({ props })}
-									<a href={item.url} {...props}>
-										<item.icon />
-										<span>{item.title}</span>
+									<a href={route.path} {...props}>
+										<route.icon class="size-6" />
+										<span class="text-base">{route.name}</span>
 									</a>
 								{/snippet}
 							</Sidebar.MenuButton>
