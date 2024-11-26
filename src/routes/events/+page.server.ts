@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "$env/static/private";
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import type { ApiResponse } from "$lib/api/types";
 import type { Event } from "$lib/map/event/types";
 import { fail, superValidate } from "sveltekit-superforms";
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const limit = url.searchParams.get("limit") || "10";
 
 	const response = await fetch(
-		`${BACKEND_URL}/api/events?page=${page}&limit=${limit}`,
+		`${PUBLIC_BACKEND_URL}/api/events?page=${page}&limit=${limit}`,
 		{
 			method: "GET"
 		}
@@ -34,7 +34,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const response = await fetch(`${BACKEND_URL}/api/events`, {
+		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/events`, {
 			method: "POST",
 			body: JSON.stringify(form.data),
 			headers: {

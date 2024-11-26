@@ -10,6 +10,7 @@ const config: Config = {
 		fontFamily: {
 			inter: ["inter"],
 			"inter-medium": ["inter-medium"],
+			"inter-semibold": ["inter-semibold"],
 			"inter-bold": ["inter-bold"]
 		},
 		container: {

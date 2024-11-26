@@ -1,6 +1,9 @@
 import type { Group } from "konva/lib/Group";
 import type { TransformMatrix } from "./types";
 import { createSeatFromSvg } from "./seat/utils";
+import type { Seat } from "./seat/types";
+import { Node, type NodeConfig } from "konva/lib/Node";
+import type { Rect } from "konva/lib/shapes/Rect";
 
 export function parseTransform(transform: string): TransformMatrix | null {
 	if (!transform.includes("matrix")) {
@@ -39,5 +42,15 @@ export async function loadFromSvg(url: string, group: Group): Promise<void> {
 		const seat = createSeatFromSvg(rect);
 
 		group.add(seat);
+	});
+}
+
+export function loadSeats(seats: Seat[], group: Group): void {
+	seats.forEach((seat) => {
+		const node: Rect = Node.create(seat.metadata);
+        node.on('click', () => {
+            console.log(seat)
+        })
+        group.add(node)
 	});
 }

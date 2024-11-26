@@ -16,6 +16,12 @@
 	}
 
 	@font-face {
+		font-family: 'inter-semibold';
+		font-display: swap;
+		src: url('/fonts/inter/Inter-SemiBold.ttf');
+	}
+
+	@font-face {
 		font-family: 'inter-bold';
 		font-display: swap;
 		src: url('/fonts/inter/Inter-Bold.ttf');
@@ -38,6 +44,7 @@
 		--input: 214.3 31.8% 91.4%;
 		--primary: 222.2 47.4% 11.2%;
 		--primary-foreground: 210 40% 98%;
+		/*--secondary: 31 60% 56%;*/
 		--secondary: 210 40% 96.1%;
 		--secondary-foreground: 222.2 47.4% 11.2%;
 		--accent: 41 42% 61%;

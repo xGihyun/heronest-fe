@@ -2,7 +2,7 @@ import { fail, superValidate } from "sveltekit-superforms";
 import { valibot } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
 import { redirect, type Actions } from "@sveltejs/kit";
-import { BACKEND_URL } from "$env/static/private";
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import type { ApiResponse } from "$lib/api/types";
 import type { User } from "$lib/user/types";
 import { LoginSchema } from "./schema";
@@ -22,7 +22,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const response = await fetch(`${BACKEND_URL}/api/login`, {
+		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/login`, {
 			method: "POST",
 			body: JSON.stringify(form.data),
 			headers: {

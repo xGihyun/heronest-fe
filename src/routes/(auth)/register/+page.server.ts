@@ -3,8 +3,8 @@ import { valibot } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
 import { RegisterSchema } from "./schema";
 import type { Actions } from "@sveltejs/kit";
-import { BACKEND_URL } from "$env/static/private";
 import type { ApiResponse } from "$lib/api/types";
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
 export const load: PageServerLoad = async () => {
   return {
@@ -21,7 +21,7 @@ export const actions: Actions = {
       });
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/register`, {
+    const response = await fetch(`${PUBLIC_BACKEND_URL}/api/register`, {
       method: "POST",
       body: JSON.stringify(form.data),
       headers: {

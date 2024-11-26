@@ -11,9 +11,9 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<main class="w-full">
+	<main class="w-full h-[100svh] flex flex-col">
 		<Sidebar.Trigger />
-		<div class="px-5 pt-6 w-full">
+		<div class="px-5 py-5 w-full h-full">
 			{@render children()}
 		</div>
 	</main>
