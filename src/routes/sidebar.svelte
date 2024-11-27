@@ -34,11 +34,6 @@
 			icon: EventIcon
 		},
 		{
-			name: "Event Occurrences",
-			path: "/event-occurrences",
-			icon: EventIcon
-		},
-		{
 			name: "Venues",
 			path: "/venues",
 			icon: LocationIcon

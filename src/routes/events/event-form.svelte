@@ -1,20 +1,19 @@
 <script lang="ts">
 	import type { ApiResponse } from "$lib/api/types";
 	import * as Form from "$lib/components/ui/form/index.js";
+	import * as Select from "$lib/components/ui/select/index";
 	import * as Popover from "$lib/components/ui/popover/index";
-	import {
-		CalendarDate,
-		DateFormatter,
-		getLocalTimeZone,
-		today,
-		type DateValue
-	} from "@internationalized/date";
-	import { buttonVariants } from "$lib/components/ui/button";
-	import { cn } from "$lib/utils";
 	import CalendarIcon from "lucide-svelte/icons/calendar";
 	import CalendarMonthYear from "$lib/components/ui/calendar/calendar-month-year.svelte";
 	import { Input } from "$lib/components/ui/input/index.js";
-	import { CreateEventOccurrenceSchema } from "$lib/map/event/schema";
+	import { CreateEventSchema } from "$lib/map/event/schema";
+	import {
+		CalendarDate,
+		DateFormatter,
+		getLocalTimeZone
+	} from "@internationalized/date";
+	import { cn } from "$lib/utils";
+	import { buttonVariants } from "$lib/components/ui/button";
 	import { toast } from "svelte-sonner";
 	import {
 		type SuperValidated,
@@ -22,16 +21,23 @@
 		superForm
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
+	import type { Venue } from "$lib/map/venue/types";
+	import { FormAction } from "$lib/types";
+	import { getFormState } from "./state.svelte";
 
 	type Props = {
-		form: SuperValidated<Infer<typeof CreateEventOccurrenceSchema>>;
+		form: SuperValidated<Infer<typeof CreateEventSchema>>;
+		venues: Venue[];
 	};
 
 	let props: Props = $props();
 	let toastId: number | string;
 
+	const formState = getFormState();
+	const action = formState.action === FormAction.Create ? "?/create" : "?/edit";
+
 	const form = superForm(props.form, {
-		validators: valibotClient(CreateEventOccurrenceSchema),
+		validators: valibotClient(CreateEventSchema),
 		onSubmit: () => {
 			toastId = toast.loading("Submitting...");
 		},
@@ -40,25 +46,66 @@
 				const result: ApiResponse = event.result.data?.result;
 				toast.success(result.message || "Success.", { id: toastId });
 			}
-		}
+		},
+        resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
 
+	if (formState.data) {
+		$formData = formState.data;
+	}
+
 	const df = new DateFormatter("en-US", {
 		dateStyle: "long"
 	});
-	const timeZone = getLocalTimeZone();
-	let startAt = $state<Date | null>(null);
-	let endAt = $state<Date | null>(null);
+
+	let startAt = $state<Date | undefined>();
+	let endAt = $state<Date | undefined>();
 
 	$effect(() => {
 		startAt = $formData.start_at;
 		endAt = $formData.end_at;
 	});
+
+	const timeZone = getLocalTimeZone();
+
+	const venueTriggerContent = $derived(
+		props.venues.find((v) => v.venue_id === $formData.venue_id)?.name ??
+			"Select a venue."
+	);
 </script>
 
-<form method="POST" action="?/createOccurrence" use:enhance>
+<form method="POST" {action} use:enhance>
+	<Form.Field {form} name="event_id" hidden>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Input {...props} bind:value={$formData.event_id} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+
+	<Form.Field {form} name="name">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Name</Form.Label>
+				<Input {...props} bind:value={$formData.name} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+
+	<Form.Field {form} name="description">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Description</Form.Label>
+				<Input {...props} bind:value={$formData.description} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+
 	<Form.Field {form} name="start_at">
 		<Form.Control>
 			{#snippet children({ props })}
@@ -86,8 +133,7 @@
 									)
 								: undefined}
 							minValue={new CalendarDate(1900, 1, 1)}
-							maxValue={today(timeZone)}
-							calendarLabel="Event Start Date"
+							calendarLabel="Event start"
 							onValueChange={(v) => {
 								if (!v) {
 									$formData.start_at = new Date();
@@ -132,8 +178,7 @@
 									)
 								: undefined}
 							minValue={new CalendarDate(1900, 1, 1)}
-							maxValue={today(timeZone)}
-							calendarLabel="Event Start Date"
+							calendarLabel="Event start"
 							onValueChange={(v) => {
 								if (!v) {
 									$formData.end_at = new Date();
@@ -151,11 +196,25 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="event_id">
+	<Form.Field {form} name="venue_id">
 		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Description</Form.Label>
-				<Input {...props} bind:value={$formData.event_id} />
+			{#snippet children({ props: formProps })}
+				<Form.Label>Venue</Form.Label>
+				<Select.Root
+					type="single"
+					bind:value={$formData.venue_id}
+					name={formProps.name}
+				>
+					<Select.Trigger {...formProps}>
+						{venueTriggerContent}
+					</Select.Trigger>
+					<Select.Content>
+						{#each props.venues as venue (venue.venue_id)}
+							<Select.Item value={venue.venue_id} label={venue.name}
+							></Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

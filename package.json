@@ -47,6 +47,7 @@
   "type": "module",
   "dependencies": {
     "@tanstack/table-core": "^8.20.5",
-    "konva": "^9.3.16"
+    "konva": "^9.3.16",
+    "uuid": "^11.0.3"
   }
 }

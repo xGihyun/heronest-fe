@@ -1,40 +1,44 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import type { ApiResponse } from "$lib/api/types";
-import type { Venue } from "$lib/map/venue/types";
 import { fail, superValidate } from "sveltekit-superforms";
 import type { PageServerLoad } from "./$types";
 import { valibot } from "sveltekit-superforms/adapters";
-import { CreateVenueSchema } from "$lib/map/venue/schema";
+import { CreateUserSchema } from "$lib/user/schema";
 import type { Actions } from "@sveltejs/kit";
+import type { User } from "$lib/user/types";
 
 export const load: PageServerLoad = async ({ url }) => {
 	const page = url.searchParams.get("page") || "1";
 	const limit = url.searchParams.get("limit") || "10";
 
 	const response = await fetch(
-		`${PUBLIC_BACKEND_URL}/api/venues?page=${page}&limit=${limit}`,
+		`${PUBLIC_BACKEND_URL}/api/users?page=${page}&limit=${limit}`,
 		{
 			method: "GET"
 		}
 	);
-	const result: ApiResponse<Venue[]> = await response.json();
+	const result: ApiResponse<User[]> = await response.json();
+
+    console.log("page.server.ts:", result)
 
 	return {
 		venues: result.data,
-		form: await superValidate(valibot(CreateVenueSchema))
+		form: await superValidate(valibot(CreateUserSchema))
 	};
 };
 
 export const actions: Actions = {
 	create: async (event) => {
-		const form = await superValidate(event, valibot(CreateVenueSchema));
+		const form = await superValidate(event, valibot(CreateUserSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form
 			});
 		}
 
-		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/venues`, {
+        console.log(form.data)
+
+		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/users`, {
 			method: "POST",
 			body: JSON.stringify(form.data),
 			headers: {
@@ -44,20 +48,22 @@ export const actions: Actions = {
 
 		const result: ApiResponse = await response.json();
 
+        console.log("Created user:", result)
+
 		return {
 			form,
 			result
 		};
 	},
 	edit: async (event) => {
-		const form = await superValidate(event, valibot(CreateVenueSchema));
+		const form = await superValidate(event, valibot(CreateUserSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form
 			});
 		}
 
-		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/venues/${form.data.venue_id}`, {
+		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/users/${form.data.user_id}`, {
 			method: "PATCH",
 			body: JSON.stringify(form.data),
 			headers: {

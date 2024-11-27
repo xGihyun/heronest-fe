@@ -10,6 +10,8 @@
 		superForm
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
+	import { getFormState } from "./state.svelte";
+	import { FormAction } from "$lib/types";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateVenueSchema>>;
@@ -17,6 +19,9 @@
 
 	let props: Props = $props();
 	let toastId: number | string;
+
+	const formState = getFormState();
+	const action = formState.action === FormAction.Create ? "?/create" : "?/edit";
 
 	const form = superForm(props.form, {
 		validators: valibotClient(CreateVenueSchema),
@@ -32,9 +37,22 @@
 	});
 
 	const { form: formData, enhance } = form;
+
+	if (formState.data) {
+		$formData = formState.data;
+	}
 </script>
 
-<form method="POST" action="?/create" use:enhance>
+<form method="POST" {action} use:enhance>
+	<Form.Field {form} name="venue_id" hidden>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Input {...props} bind:value={$formData.venue_id} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+
 	<Form.Field {form} name="name">
 		<Form.Control>
 			{#snippet children({ props })}

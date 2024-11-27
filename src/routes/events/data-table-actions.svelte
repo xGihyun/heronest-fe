@@ -2,8 +2,20 @@
 	import Ellipsis from "lucide-svelte/icons/ellipsis";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
+	import * as Dialog from "$lib/components/ui/dialog/index";
+	import { buttonVariants } from "$lib/components/ui/button";
+	import EventForm from "./event-form.svelte";
+	import type { Event } from "$lib/map/event/types";
+	import { getFormState } from "./state.svelte";
+	import { FormAction } from "$lib/types";
 
-	let { id }: { id: string } = $props();
+	type Props = {
+		event: Event;
+	};
+
+	let props: Props = $props();
+
+	const formState = getFormState();
 </script>
 
 <DropdownMenu.Root>
@@ -21,13 +33,21 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Group>
-			<DropdownMenu.GroupHeading>Actions</DropdownMenu.GroupHeading>
-			<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(id)}>
-				Copy payment ID
-			</DropdownMenu.Item>
-		</DropdownMenu.Group>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item>Edit</DropdownMenu.Item>
+		<DropdownMenu.Item
+			onclick={() => {
+				formState.action = FormAction.Edit;
+				formState.data = {
+                    event_id: props.event.event_id,
+					name: props.event.name,
+					start_at: new Date(props.event.start_at),
+					end_at: new Date(props.event.end_at),
+					description: props.event.description,
+					venue_id: props.event.venue.venue_id
+				};
+                formState.isOpen = true
+			}}
+		>
+			Edit
+		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

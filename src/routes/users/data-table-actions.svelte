@@ -2,8 +2,19 @@
 	import Ellipsis from "lucide-svelte/icons/ellipsis";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
+	import { getFormState } from "./state.svelte";
+	import { FormAction } from "$lib/types";
+	import type { User } from "$lib/user/types";
 
-	let { id }: { id: string } = $props();
+	type Props = {
+		user: User;
+	};
+
+	let props: Props = $props();
+
+	const formState = getFormState();
+
+	// TODO: Remove `password`
 </script>
 
 <DropdownMenu.Root>
@@ -21,13 +32,18 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Group>
-			<DropdownMenu.GroupHeading>Actions</DropdownMenu.GroupHeading>
-			<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(id)}>
-				Copy payment ID
-			</DropdownMenu.Item>
-		</DropdownMenu.Group>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item>Edit</DropdownMenu.Item>
+		<DropdownMenu.Item
+			onclick={() => {
+				formState.action = FormAction.Edit;
+				formState.data = {
+					...props.user,
+					birth_date: new Date(props.user.birth_date),
+					password: "password"
+				};
+				formState.isOpen = true;
+			}}
+		>
+			Edit
+		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

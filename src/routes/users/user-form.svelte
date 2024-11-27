@@ -10,7 +10,7 @@
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { UserRole, UserSex } from "$lib/user/types";
-	import type { SelectOption } from "$lib/types";
+	import { FormAction, type SelectOption } from "$lib/types";
 	import {
 		CalendarDate,
 		DateFormatter,
@@ -23,29 +23,39 @@
 	import CalendarIcon from "lucide-svelte/icons/calendar";
 	import CalendarMonthYear from "$lib/components/ui/calendar/calendar-month-year.svelte";
 	import { toast } from "svelte-sonner";
-	import { RegisterSchema } from "$lib/user/schema";
+	import { CreateUserSchema } from "$lib/user/schema";
+	import { getFormState } from "./state.svelte";
+	import type { ApiResponse } from "$lib/api/types";
 
 	type Props = {
-		form: SuperValidated<Infer<typeof RegisterSchema>>;
+		form: SuperValidated<Infer<typeof CreateUserSchema>>;
 	};
 
 	let props: Props = $props();
-
 	let toastId: number | string;
 
+	const formState = getFormState();
+	const action = formState.action === FormAction.Create ? "?/create" : "?/edit";
+
 	const form = superForm(props.form, {
-		validators: valibotClient(RegisterSchema),
+		validators: valibotClient(CreateUserSchema),
 		onSubmit: () => {
 			toastId = toast.loading("Submitting...");
 		},
 		onResult: (event) => {
 			if (event.result.type === "success") {
-				toast.success(event.result.data?.result.data.message, { id: toastId });
+				const result: ApiResponse = event.result.data?.result;
+				toast.success(result.message || "Success.", { id: toastId });
 			}
-		}
+		},
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
+
+	if (formState.data) {
+		$formData = formState.data;
+	}
 
 	const sexOptions: SelectOption[] = [
 		{
@@ -70,6 +80,14 @@
 		{
 			value: UserRole.Student,
 			label: "Student"
+		},
+		{
+			value: UserRole.Staff,
+			label: "Staff"
+		},
+		{
+			value: UserRole.Admin,
+			label: "Admin"
 		}
 	];
 
@@ -93,7 +111,16 @@
 	let birthDatePlaceholder = $state<DateValue>(today(timeZone));
 </script>
 
-<form method="POST" class="space-y-4" use:enhance>
+<form method="POST" {action} class="space-y-4" use:enhance>
+	<Form.Field {form} name="user_id" hidden>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Input {...props} bind:value={$formData.user_id} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+
 	<Form.Field {form} name="email">
 		<Form.Control>
 			{#snippet children({ props })}
@@ -205,12 +232,13 @@
 					<Popover.Content class="w-auto p-0" side="top">
 						<CalendarMonthYear
 							type="single"
-							value={birthDate ?
-								new CalendarDate(
-									birthDate.getFullYear(),
-									birthDate.getMonth() + 1,
-									birthDate.getDate()
-								) : undefined}
+							value={birthDate
+								? new CalendarDate(
+										birthDate.getFullYear(),
+										birthDate.getMonth() + 1,
+										birthDate.getDate()
+									)
+								: undefined}
 							bind:placeholder={birthDatePlaceholder}
 							minValue={new CalendarDate(1900, 1, 1)}
 							maxValue={today(timeZone)}

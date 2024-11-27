@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { columns } from "./columns";
 	import DataTable from "./data-table.svelte";
-	import EventForm from "./event-form.svelte";
+	import UserForm from "./user-form.svelte";
 	import * as Dialog from "$lib/components/ui/dialog/index";
 	import { buttonVariants } from "$lib/components/ui/button";
 	import { getFormState } from "./state.svelte";
@@ -31,13 +31,13 @@
 				{:else}
 					Edit
 				{/if}
-				Event
+				User
 			</Dialog.Title>
-			<Dialog.Description>Enter the event's details below.</Dialog.Description>
+			<Dialog.Description>Enter the user's details below.</Dialog.Description>
 		</Dialog.Header>
 
-		<EventForm form={data.form} venues={data.venues} />
+		<UserForm form={data.form} />
 	</Dialog.Content>
 </Dialog.Root>
 
-<DataTable data={data.events} {columns} />
+<DataTable data={data.venues} {columns} />
