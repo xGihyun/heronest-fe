@@ -2,7 +2,7 @@ import type { Group } from "konva/lib/Group";
 import type { TransformMatrix } from "./types";
 import { createSeatFromSvg } from "./seat/utils";
 import type { Seat } from "./seat/types";
-import { Node, type NodeConfig } from "konva/lib/Node";
+import { Node } from "konva/lib/Node";
 import type { Rect } from "konva/lib/shapes/Rect";
 
 export function parseTransform(transform: string): TransformMatrix | null {

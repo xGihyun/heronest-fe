@@ -1,15 +1,15 @@
 <script lang="ts">
-	import seatsSvg from "./seats.svg";
 	import Konva from "konva";
 	import { onMount } from "svelte";
 	import { loadSeats } from "$lib/map/utils";
+	import * as Dialog from "$lib/components/ui/dialog/index.js";
 	import { handleWheel, handleZoom } from "$lib/map/handlers";
 	import {
 		ArrowDownDropIcon,
 		LocationIcon,
 		MinusIcon,
 		PlusIcon,
-        SaveIcon
+		SaveIcon
 	} from "$lib/icons";
 	import { Slider } from "$lib/components/ui/slider";
 	import { Button } from "$lib/components/ui/button";
@@ -18,6 +18,7 @@
 	import { handleSave } from "$lib/map/seat/handlers";
 	import { toast } from "svelte-sonner";
 	import { ApiResponseStatus } from "$lib/api/types";
+	import type { Seat } from "$lib/map/seat/types.js";
 
 	let { data } = $props();
 
@@ -27,6 +28,8 @@
 
 	let stage: Konva.Stage | undefined;
 	let seatsGroup: Konva.Group | undefined;
+
+	let selectedSeat: Seat | null = $state(null);
 
 	onMount(async () => {
 		if (!mapContainer) {
@@ -54,7 +57,16 @@
 		const layer = new Konva.Layer();
 		seatsGroup = new Konva.Group();
 
-		loadSeats(data.seats, seatsGroup);
+		//loadSeats(data.seats, seatsGroup);
+
+		for (const seat of data.seats) {
+			const node: Konva.Rect = Konva.Node.create(seat.metadata);
+
+			node.on("click", () => {
+				selectedSeat = seat;
+			});
+			seatsGroup.add(node);
+		}
 
 		seatsGroup.find(".seat").forEach((seat) => {
 			//seat.on("click", () => {
@@ -226,7 +238,31 @@
 	</div>
 
 	<Button class="absolute bottom-10 right-20 z-50" onclick={saveSeats}>
-        <SaveIcon class="size-6" />
+		<SaveIcon class="size-6" />
 		Save
 	</Button>
+
+	<Dialog.Root
+		open={selectedSeat !== null}
+		onOpenChange={(isOpen) => {
+			if (!isOpen) {
+				selectedSeat = null;
+			}
+		}}
+	>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Seat</Dialog.Title>
+			</Dialog.Header>
+
+			{#if selectedSeat !== null}
+				{selectedSeat.seat_number}
+                {selectedSeat.status}
+
+                <Button>
+                    Save
+                </Button>
+			{/if}
+		</Dialog.Content>
+	</Dialog.Root>
 </div>

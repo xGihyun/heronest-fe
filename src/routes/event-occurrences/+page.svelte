@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { columns } from "./columns";
 	import DataTable from "./data-table.svelte";
-	import CreateEventForm from "./create-event-form.svelte";
+	import CreateEventOccurenceForm from "./create-event-occurence-form.svelte";
 	import * as Dialog from "$lib/components/ui/dialog/index";
 	import { buttonVariants } from "$lib/components/ui/button";
 
@@ -10,16 +10,17 @@
 
 <Dialog.Root>
 	<Dialog.Trigger class={buttonVariants({ variant: "default" })}>
-		Create
+		Create Occurence
 	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Create Event</Dialog.Title>
+			<Dialog.Title>Create Event Occurence</Dialog.Title>
 			<Dialog.Description>Enter the event's details below.</Dialog.Description>
 		</Dialog.Header>
 
-		<CreateEventForm form={data.form} />
+		<CreateEventOccurenceForm form={data.form} />
 	</Dialog.Content>
 </Dialog.Root>
 
 <DataTable data={data.events} {columns} />
+
