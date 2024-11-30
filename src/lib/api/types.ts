@@ -12,6 +12,6 @@ export type ApiResponse<T = unknown> = {
 };
 
 export type PaginationResult = {
-	page: number | string ;
-	limit: number | string ;
+	page?: number | string ;
+	limit?: number | string ;
 };

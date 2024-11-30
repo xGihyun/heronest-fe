@@ -19,8 +19,6 @@ export const load: PageServerLoad = async ({ url }) => {
 	);
 	const result: ApiResponse<User[]> = await response.json();
 
-    console.log("page.server.ts:", result)
-
 	return {
 		venues: result.data,
 		form: await superValidate(valibot(CreateUserSchema))
@@ -36,8 +34,6 @@ export const actions: Actions = {
 			});
 		}
 
-        console.log(form.data)
-
 		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/users`, {
 			method: "POST",
 			body: JSON.stringify(form.data),
@@ -47,8 +43,6 @@ export const actions: Actions = {
 		});
 
 		const result: ApiResponse = await response.json();
-
-        console.log("Created user:", result)
 
 		return {
 			form,

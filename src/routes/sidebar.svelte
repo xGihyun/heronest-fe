@@ -8,8 +8,15 @@
 		MapIcon,
 		UsersIcon
 	} from "$lib/icons";
+	import type { User } from "$lib/user/types";
 	import type { Component } from "svelte";
 	import type { SVGAttributes } from "svelte/elements";
+
+    type Props = {
+        user: User
+    }
+
+    let props: Props = $props()
 
 	type Route = {
 		name: string;
@@ -23,11 +30,11 @@
 			path: "/",
 			icon: HomeIcon
 		},
-		{
-			name: "Map",
-			path: "/map",
-			icon: MapIcon
-		},
+		//{
+		//	name: "Map",
+		//	path: "/map",
+		//	icon: MapIcon
+		//},
 		{
 			name: "Events",
 			path: "/events",
@@ -73,5 +80,9 @@
 		</Sidebar.Group>
 	</Sidebar.Content>
 
+    <a href="/profile">
+        {props.user.first_name} 
+        {props.user.last_name}
+    </a>
 	<Sidebar.Footer>Logout</Sidebar.Footer>
 </Sidebar.Root>

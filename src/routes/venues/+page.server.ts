@@ -7,20 +7,8 @@ import { valibot } from "sveltekit-superforms/adapters";
 import { CreateVenueSchema } from "$lib/map/venue/schema";
 import type { Actions } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ url }) => {
-	const page = url.searchParams.get("page") || "1";
-	const limit = url.searchParams.get("limit") || "10";
-
-	const response = await fetch(
-		`${PUBLIC_BACKEND_URL}/api/venues?page=${page}&limit=${limit}`,
-		{
-			method: "GET"
-		}
-	);
-	const result: ApiResponse<Venue[]> = await response.json();
-
+export const load: PageServerLoad = async () => {
 	return {
-		venues: result.data,
 		form: await superValidate(valibot(CreateVenueSchema))
 	};
 };

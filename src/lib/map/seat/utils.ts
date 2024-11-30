@@ -1,5 +1,8 @@
 import { Rect } from "konva/lib/shapes/Rect";
 import { parseTransform } from "../utils";
+import { SeatStatus, type Seat } from "./types";
+import { selectedSeat } from "../../../routes/venues/[venueId]/map/state.svelte";
+import { SEAT_COLOR } from "./constants";
 
 export function createSeatFromSvg(rect: SVGRectElement): Rect {
 	let x = parseFloat(rect.getAttribute("x") || "0");
@@ -30,7 +33,7 @@ export function createSeatFromSvg(rect: SVGRectElement): Rect {
 		y: y,
 		width: width,
 		height: height,
-		fill: "#888888",
+		fill: SEAT_COLOR[SeatStatus.Unavailable],
 		rotation: rotation,
 		scaleX: scaleX,
 		scaleY: scaleY,
@@ -39,4 +42,32 @@ export function createSeatFromSvg(rect: SVGRectElement): Rect {
 	});
 
 	return seat;
+}
+
+export function setupEventListeners(
+	rect: Rect,
+	seat: Seat,
+	mapContainer: HTMLDivElement
+) {
+	rect.on("click", () => {
+		selectedSeat.seat = seat;
+		selectedSeat.rect = rect;
+	});
+
+	rect.on("mouseenter", () => {
+		if (!mapContainer) {
+			return;
+		}
+		rect.fill(SEAT_COLOR.hover);
+		mapContainer.style.cursor = "pointer";
+	});
+
+	rect.on("mouseleave", () => {
+		if (!mapContainer) {
+			return;
+		}
+
+		rect.fill(SEAT_COLOR[seat.status]);
+		mapContainer.style.cursor = "default";
+	});
 }

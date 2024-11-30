@@ -82,7 +82,7 @@ export function handleZoom(
 		y: (stageCenter.y - oldPosition.y) / oldScale
 	};
 
-	const newStagePosition = {
+	const newStagePosition: Vector2d = {
 		x: stageCenter.x - viewCenter.x * newScale,
 		y: stageCenter.y - viewCenter.y * newScale
 	};

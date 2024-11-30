@@ -4,7 +4,8 @@ export enum SeatStatus {
 	Unavailable = "unavailable"
 }
 
-export type CreateSeatRequest = {
+export type Seat = {
+	seat_id: string;
 	seat_number: string;
 	status: SeatStatus;
 	seat_section_id?: string;
@@ -12,6 +13,10 @@ export type CreateSeatRequest = {
 	metadata: object;
 };
 
-export type Seat = {
-	seat_id: string;
-} & CreateSeatRequest;
+//export type CreateSeatRequest = {
+//	seat_number: string;
+//	status: SeatStatus;
+//	seat_section_id?: string;
+//	venue_id: string;
+//	metadata: object;
+//};

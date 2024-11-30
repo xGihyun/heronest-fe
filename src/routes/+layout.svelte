@@ -4,16 +4,18 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import AppSidebar from "./sidebar.svelte";
 
-	let { children } = $props();
+	let { data, children } = $props();
 </script>
 
 <Toaster closeButton richColors />
 
 <Sidebar.Provider>
-	<AppSidebar />
-	<main class="w-full h-[100svh] flex flex-col">
+	{#if data.user}
+		<AppSidebar user={data.user} />
+	{/if}
+	<main class="flex h-[100svh] w-full flex-col">
 		<Sidebar.Trigger />
-		<div class="px-5 py-5 w-full h-full">
+		<div class="h-full w-full px-5 py-5">
 			{@render children()}
 		</div>
 	</main>
