@@ -29,7 +29,7 @@ export async function getEvents(
 		: endpoint;
 
 	const response = await fetch(fullEndpoint, {
-		method: "GET"
+		method: "GET",
 	});
 	const result: ApiResponse<Event[]> = await response.json();
 

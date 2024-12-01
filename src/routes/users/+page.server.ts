@@ -5,22 +5,16 @@ import type { PageServerLoad } from "./$types";
 import { valibot } from "sveltekit-superforms/adapters";
 import { CreateUserSchema } from "$lib/user/schema";
 import type { Actions } from "@sveltejs/kit";
-import type { User } from "$lib/user/types";
+import { getUsers } from "$lib/user/requests";
 
 export const load: PageServerLoad = async ({ url }) => {
 	const page = url.searchParams.get("page") || "1";
 	const limit = url.searchParams.get("limit") || "10";
 
-	const response = await fetch(
-		`${PUBLIC_BACKEND_URL}/api/users?page=${page}&limit=${limit}`,
-		{
-			method: "GET"
-		}
-	);
-	const result: ApiResponse<User[]> = await response.json();
+	const users = await getUsers({ page, limit });
 
 	return {
-		venues: result.data,
+		venues: users.data,
 		form: await superValidate(valibot(CreateUserSchema))
 	};
 };
@@ -57,13 +51,16 @@ export const actions: Actions = {
 			});
 		}
 
-		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/users/${form.data.user_id}`, {
-			method: "PATCH",
-			body: JSON.stringify(form.data),
-			headers: {
-				"Content-Type": "application/json"
+		const response = await fetch(
+			`${PUBLIC_BACKEND_URL}/api/users/${form.data.user_id}`,
+			{
+				method: "PATCH",
+				body: JSON.stringify(form.data),
+				headers: {
+					"Content-Type": "application/json"
+				}
 			}
-		});
+		);
 
 		const result: ApiResponse = await response.json();
 

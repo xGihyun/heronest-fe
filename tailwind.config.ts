@@ -21,6 +21,11 @@ const config: Config = {
 			}
 		},
 		extend: {
+			boxShadow: {
+				"map": "0 0px 30px 28px rgba(229,229,229, 1)",
+				"map-bottom": "0 8px 30px 28px rgba(229,229,229, 1)",
+				"map-top": "0 8px 30px 28px rgba(229,229,229, 1)"
+			},
 			colors: {
 				border: "hsl(var(--border) / <alpha-value>)",
 				input: "hsl(var(--input) / <alpha-value>)",

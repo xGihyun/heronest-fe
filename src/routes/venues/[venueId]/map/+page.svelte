@@ -6,6 +6,7 @@
 	import { handleWheel, handleZoom } from "$lib/map/handlers";
 	import {
 		ArrowDownDropIcon,
+		FileImportIcon,
 		LocationIcon,
 		MinusIcon,
 		PlusIcon,
@@ -25,6 +26,8 @@
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { SEAT_COLOR } from "$lib/map/seat/constants.js";
 	import type { SelectOption } from "$lib/types.js";
+	import Sidebar from "./sidebar.svelte";
+	import SeatForm from "./seat-form.svelte";
 
 	let { data } = $props();
 
@@ -73,19 +76,8 @@
 
 		setupMap(stage, layer, seatsGroup);
 
-		const resizeObserver = new ResizeObserver(() => {
-			if (!mapContainer || !stage) {
-				return;
-			}
-
-			stage.width(mapContainer.offsetWidth);
-			stage.height(mapContainer.offsetHeight);
-		});
-		resizeObserver.observe(mapContainer);
-
 		return () => {
 			stage?.destroyChildren();
-			resizeObserver.disconnect();
 		};
 	});
 
@@ -125,210 +117,246 @@
 	);
 </script>
 
-<div class="relative h-full w-full">
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<button
-					{...props}
-					class="absolute left-1/2 top-10 z-50 flex -translate-x-1/2
-		items-center gap-2 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-4 py-3
-		text-background shadow"
-				>
-					<LocationIcon class="size-6 text-accent" />
-					<span class="font-inter-medium text-background/80">
-						{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
-					</span>
-					<ArrowDownDropIcon class="size-6" />
-				</button>
-			{/snippet}
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content class="w-full max-w-96">
-			{#each data.venues as venue (venue.venue_id)}
-				<DropdownMenu.Item class="w-full cursor-pointer font-inter-medium">
-					{#snippet child({ props })}
-						<a href={`/venues/${venue.venue_id}/map`} {...props}>
-							{venue.name}
-						</a>
-					{/snippet}
-				</DropdownMenu.Item>
-			{/each}
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-
-	<div
-		bind:this={mapContainer}
-		class="relative z-40 h-full w-full rounded-lg bg-neutral-200"
-	></div>
-
-	<div
-		class="absolute left-10 top-10 z-50 w-full max-w-44 bg-neutral-900/85
-        px-2 py-3 text-background"
-	>
-		<p class="font-inter-bold">Events</p>
-		<div class="space-y-1">
-			{#each data.events as event (event.event_id)}
-				<p>{event.name}</p>
-			{/each}
+<div class="flex h-full w-full overflow-clip">
+	<div class="relative h-full flex-1">
+		<div
+			class="absolute left-0 top-0 z-[11] flex h-20
+            w-full items-center gap-2 bg-neutral-200 text-foreground shadow-map-bottom"
+		>
+			<LocationIcon class="size-12" />
+			<div>
+				<p class="font-inter-semibold">Venue</p>
+				<p class="font-inter-semibold text-lg text-foreground/60">
+					{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
+				</p>
+			</div>
 		</div>
-	</div>
 
-	<div
-		class="absolute bottom-10 left-1/2
-        z-50 flex w-full max-w-96 -translate-x-1/2
-        cursor-pointer
-		items-center gap-2 space-x-4 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-4
-		py-3 text-background
-        shadow"
-	>
-		<Button
-			class="h-auto rounded-full p-1"
-			variant="secondary"
-			onclick={() => {
-				if (!stage) {
-					return;
-				}
-				scale = handleZoom("out", stage, scale);
-			}}
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						class="absolute left-2 top-32 z-[11] flex
+		items-center gap-2 rounded-full border-2 border-neutral-400/85
+                        bg-neutral-900/85 px-3 py-2
+		text-background shadow"
+					>
+						<LocationIcon class="size-6 text-accent" />
+						<span class="font-inter-medium text-background/80">
+							Events ({data.events.length})
+						</span>
+						<ArrowDownDropIcon class="size-6" />
+					</button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content class="w-full max-w-96">
+				{#each data.events as event (event.event_id)}
+					<DropdownMenu.Item class="w-full cursor-pointer font-inter-medium">
+						{event.name}
+					</DropdownMenu.Item>
+				{/each}
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+
+		<div
+			bind:this={mapContainer}
+			class="relative z-10 h-full w-full bg-neutral-200"
+		></div>
+
+		<div
+			class="absolute bottom-0 left-0 z-[11] h-20 w-full bg-neutral-200
+            text-foreground shadow-map-top"
 		>
-			<MinusIcon class="size-6" />
-		</Button>
+			<div
+				class="absolute bottom-10 left-1/2
+                z-10 flex w-full max-w-96 -translate-x-1/2
+                cursor-pointer
+                items-center gap-2 space-x-4 rounded-full border-2
+                border-neutral-400/85 bg-neutral-900/85 px-3
+                py-2 text-background
+                shadow"
+			>
+				<Button
+					class="h-auto rounded-full p-1"
+					variant="secondary"
+					onclick={() => {
+						if (!stage) {
+							return;
+						}
+						scale = handleZoom("out", stage, scale);
+					}}
+				>
+					<MinusIcon class="size-4" />
+				</Button>
 
-		<Slider
-			value={[scale]}
-			min={SLIDER_SCALE.min}
-			max={SLIDER_SCALE.max}
-			step={SLIDER_SCALE.step}
-			onValueChange={(value) => {
-				if (!stage) {
+				<Slider
+					value={[scale]}
+					min={SLIDER_SCALE.min}
+					max={SLIDER_SCALE.max}
+					step={SLIDER_SCALE.step}
+					onValueChange={(value) => {
+						if (!stage) {
+							return;
+						}
+						scale = handleZoom("set", stage, scale, value[0]);
+					}}
+				/>
+
+				<Button
+					class="h-auto rounded-full p-1"
+					variant="secondary"
+					onclick={() => {
+						if (!stage) {
+							return;
+						}
+						scale = handleZoom("in", stage, scale);
+					}}
+				>
+					<PlusIcon class="size-4" />
+				</Button>
+			</div>
+
+			<Button
+				class="absolute right-44 h-auto
+                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
+                shadow"
+				onclick={() => svgInput?.click()}
+			>
+				<FileImportIcon class="size-4" />
+				Import
+			</Button>
+
+			<Button
+				class="absolute right-20 h-auto
+                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
+                shadow"
+				onclick={saveSeats}
+			>
+				<SaveIcon class="size-4" />
+				Save
+			</Button>
+		</div>
+
+		<input
+			type="file"
+			accept=".svg"
+			hidden
+			bind:this={svgInput}
+			onchange={(e) => {
+				const file = e.currentTarget.files?.[0];
+				if (!file) {
 					return;
 				}
-				scale = handleZoom("set", stage, scale, value[0]);
-			}}
-		/>
 
-		<Button
-			class="h-auto rounded-full p-1"
-			variant="secondary"
-			onclick={() => {
-				if (!stage) {
-					return;
-				}
-				scale = handleZoom("in", stage, scale);
-			}}
-		>
-			<PlusIcon class="size-6" />
-		</Button>
-	</div>
-
-	<Button class="absolute bottom-10 right-20 z-50" onclick={saveSeats}>
-		<SaveIcon class="size-6" />
-		Save
-	</Button>
-
-	<input
-		type="file"
-		accept=".svg"
-		hidden
-		bind:this={svgInput}
-		onchange={(e) => {
-			const file = e.currentTarget.files?.[0];
-			if (!file) {
-				return;
-			}
-
-			const reader = new FileReader();
-			reader.onload = (event) => {
-				if (!stage) {
-					console.warn("Canvas stage not found.");
-					return;
-				}
-
-				const svgContent = event.target?.result;
-
-				if (!svgContent) {
-					console.warn("SVG content not found.");
-					return;
-				}
-
-				loadFromSvg(svgContent.toString(), seatsGroup);
-				setupMap(stage, layer, seatsGroup);
-
-				seatsGroup.find(".seat").forEach((node, i) => {
-					if (!mapContainer) {
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					if (!stage) {
+						console.warn("Canvas stage not found.");
 						return;
 					}
 
-					const rect = node as Konva.Rect;
+					const svgContent = event.target?.result;
 
-					const seat: Seat = {
-						seat_id: uuidv4(),
-						status: SeatStatus.Unavailable,
-						venue_id: data.venueId,
-						metadata: JSON.parse(rect.toJSON()),
-						seat_number: `${i + 1}`
-					};
+					if (!svgContent) {
+						console.warn("SVG content not found.");
+						return;
+					}
 
-					seats.push(seat);
-					setupEventListeners(rect, seat, mapContainer);
-				});
-			};
-			reader.readAsText(file);
-		}}
-	/>
+					loadFromSvg(svgContent.toString(), seatsGroup);
+					setupMap(stage, layer, seatsGroup);
 
-	<Button
-		class="absolute bottom-20 right-20 z-50"
-		onclick={() => svgInput?.click()}
-	>
-		<SaveIcon className="size-6" />
-		Import
-	</Button>
-
-	<Dialog.Root
-		open={selectedSeat.seat !== null}
-		onOpenChange={(isOpen) => {
-			if (!isOpen) {
-				selectedSeat.seat = null;
-			}
-		}}
-	>
-		<Dialog.Content>
-			{#if selectedSeat.seat !== null}
-				<Dialog.Header>
-					<Dialog.Title>
-						Seat
-						{selectedSeat.seat.seat_number}
-					</Dialog.Title>
-				</Dialog.Header>
-
-				<Input bind:value={selectedSeat.seat.seat_number} name="seat_number" />
-
-				<Select.Root
-					type="single"
-					name="status"
-					bind:value={selectedSeat.seat.status}
-					onValueChange={(value) => {
-						if (selectedSeat.rect === null) {
+					seatsGroup.find(".seat").forEach((node, i) => {
+						if (!mapContainer) {
 							return;
 						}
-						selectedSeat.rect.fill(SEAT_COLOR[value as SeatStatus]);
-					}}
-				>
-					<Select.Trigger>
-						{seatStatusTriggerContent}
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Group>
-							<Select.GroupHeading>Status</Select.GroupHeading>
-							{#each seatStatusOptions as status (status.value)}
-								<Select.Item value={status.value} label={status.label}
-								></Select.Item>
-							{/each}
-						</Select.Group>
-					</Select.Content>
-				</Select.Root>
-			{/if}
-		</Dialog.Content>
-	</Dialog.Root>
+
+						const rect = node as Konva.Rect;
+
+						const seat: Seat = {
+							seat_id: uuidv4(),
+							status: SeatStatus.Unavailable,
+							venue_id: data.venueId,
+							metadata: JSON.parse(rect.toJSON()),
+							seat_number: `${i + 1}`
+						};
+
+						seats.push(seat);
+						setupEventListeners(rect, seat, mapContainer);
+					});
+				};
+				reader.readAsText(file);
+			}}
+		/>
+
+		<Dialog.Root
+			open={selectedSeat.seat !== null}
+			onOpenChange={(isOpen) => {
+				if (!isOpen) {
+					selectedSeat.seat = null;
+				}
+			}}
+		>
+			<Dialog.Content>
+				{#if selectedSeat.seat !== null}
+					<SeatForm
+						form={data.form}
+						seat={{
+							seat_id: selectedSeat.seat.seat_id,
+							seat_number: selectedSeat.seat.seat_number,
+							status: selectedSeat.seat.status,
+							venue_id: data.venueId,
+							metadata: selectedSeat.seat.metadata,
+							seat_section_id: selectedSeat.seat.seat_section_id || null,
+							reserved_by: selectedSeat.seat.reserved_by ? {
+								seat_id: selectedSeat.seat.seat_id,
+								metadata: null,
+								user_id: selectedSeat.seat.reserved_by?.user.user_id || "",
+								event_id: selectedSeat.seat.reserved_by?.event.event_id || ""
+							} : null
+						}}
+						events={data.events}
+					/>
+					<Dialog.Header>
+						<Dialog.Title>
+							Seat
+							{selectedSeat.seat.seat_number}
+						</Dialog.Title>
+					</Dialog.Header>
+
+					<Input
+						bind:value={selectedSeat.seat.seat_number}
+						name="seat_number"
+					/>
+
+					<Select.Root
+						type="single"
+						name="status"
+						bind:value={selectedSeat.seat.status}
+						onValueChange={(value) => {
+							if (selectedSeat.rect === null) {
+								return;
+							}
+							selectedSeat.rect.fill(SEAT_COLOR[value as SeatStatus]);
+						}}
+					>
+						<Select.Trigger>
+							{seatStatusTriggerContent}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								<Select.GroupHeading>Status</Select.GroupHeading>
+								{#each seatStatusOptions as status (status.value)}
+									<Select.Item value={status.value} label={status.label}
+									></Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				{/if}
+			</Dialog.Content>
+		</Dialog.Root>
+	</div>
+
+	<Sidebar venues={data.venues} {seats} />
 </div>

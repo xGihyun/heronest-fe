@@ -10,6 +10,11 @@ import MinusIcon from "virtual:icons/ic/round-minus";
 import PlusIcon from "virtual:icons/ic/round-plus";
 import SaveIcon from "virtual:icons/ic/round-save";
 
+import GeminiIcon from "virtual:icons/lineicons/gemini";
+
+import WarningIcon from "virtual:icons/mingcute/warning-fill";
+import FileImportIcon from "virtual:icons/mingcute/file-import-fill";
+
 export {
 	LocationIcon,
 	ArrowDownDropIcon,
@@ -19,5 +24,8 @@ export {
 	UsersIcon,
 	PlusIcon,
 	MinusIcon,
-    SaveIcon
+	SaveIcon,
+	GeminiIcon,
+	WarningIcon,
+    FileImportIcon
 };

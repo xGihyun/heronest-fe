@@ -14,9 +14,12 @@ export type User = {
 	user_id: string;
 	email: string;
 	role: UserRole;
+} & UserDetail;
+
+export type UserDetail = {
 	first_name: string;
 	middle_name?: string;
 	last_name: string;
 	birth_date: Date;
 	sex: UserSex;
-};
+}

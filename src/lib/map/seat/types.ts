@@ -1,3 +1,5 @@
+import type { UserDetail } from "$lib/user/types";
+
 export enum SeatStatus {
 	Reserved = "reserved",
 	Available = "available",
@@ -11,6 +13,18 @@ export type Seat = {
 	seat_section_id?: string;
 	venue_id: string;
 	metadata: object;
+
+	reserved_by?: SeatReservedBy;
+};
+
+export type SeatReservedBy = {
+	user: UserDetail & { user_id: string };
+	event: ReservedSeatEventDetail;
+};
+
+export type ReservedSeatEventDetail = {
+	event_id: string;
+	name: string;
 };
 
 //export type CreateSeatRequest = {

@@ -13,7 +13,7 @@
 	{#if data.user}
 		<AppSidebar user={data.user} />
 	{/if}
-	<main class="flex h-[100svh] w-full flex-col">
+	<main class="flex h-svh w-full flex-col">
 		<Sidebar.Trigger />
 		<div class="h-full w-full px-5 py-5">
 			{@render children()}
