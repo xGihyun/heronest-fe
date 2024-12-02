@@ -5,6 +5,14 @@
 	import { Label } from "$lib/components/ui/label/index.js";
 	import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
 	import { Separator } from "$lib/components/ui/separator";
+	import { Button } from "$lib/components/ui/button";
+	import { generateEventCsv } from "$lib/map/event/spreadsheet.js";
+	import { generateTicketsCsv } from "$lib/ticket/spreadsheet.js";
+	import { generateTicketPdf, generateTicketPdfClient } from "$lib/ticket/qrcode.js";
+	import {
+		PUBLIC_STORAGE_DIRECTORY,
+		PUBLIC_TICKET_TEMPLATE_DIRECTORY
+	} from "$env/static/public";
 
 	let { data } = $props();
 
@@ -17,6 +25,23 @@
 
 <div class="space-y-4">
 	<div>
+		<Button onclick={() => generateEventCsv(data.events)}>
+			Events Download
+		</Button>
+		<Button onclick={() => generateTicketsCsv(data.tickets)}>
+			Reservations Download
+		</Button>
+		<Button
+			onclick={() =>
+                // TODO: Put this somewhere
+				generateTicketPdfClient(
+					PUBLIC_TICKET_TEMPLATE_DIRECTORY,
+					`${PUBLIC_STORAGE_DIRECTORY}/tickets`,
+					data.tickets[2]
+				)}
+		>
+			TIcket Download
+		</Button>
 		<h1 class="mb-1 font-inter-bold text-2xl">Events</h1>
 
 		<RadioGroup.Root
@@ -69,7 +94,7 @@
 		</RadioGroup.Root>
 	</div>
 
-    <Separator />
+	<Separator />
 
 	<h1 class="mb-1 font-inter-bold text-2xl">Reservations</h1>
 

@@ -8,6 +8,7 @@
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@types/eslint": "^9.6.0",
+    "@types/qrcode": "^1.5.5",
     "autoprefixer": "^10.4.20",
     "bits-ui": "next",
     "clsx": "^2.1.1",
@@ -47,7 +48,10 @@
   "type": "module",
   "dependencies": {
     "@tanstack/table-core": "^8.20.5",
+    "exceljs": "^4.4.0",
     "konva": "^9.3.16",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
     "uuid": "^11.0.3"
   }
 }
