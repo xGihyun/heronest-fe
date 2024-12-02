@@ -9,6 +9,8 @@ export const load: PageLoad = async ({ params, data }) => {
 		venueId: params.venueId,
         events: data.events,
         users: data.users,
-        form: data.form
+        form: data.form,
+        ticketForm: data.ticketForm,
+        eventId: data.eventId
 	};
 };

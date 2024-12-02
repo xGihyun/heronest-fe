@@ -3,5 +3,6 @@ import type { CreateEventOutput } from "./schema";
 
 export type Event = {
 	event_id: string;
-    venue: Venue
+    venue: Venue,
+    image_url?: string;
 } & Omit<CreateEventOutput, 'venue_id'>;

@@ -42,7 +42,8 @@
 					start_at: new Date(props.event.start_at),
 					end_at: new Date(props.event.end_at),
 					description: props.event.description,
-					venue_id: props.event.venue.venue_id
+					venue_id: props.event.venue.venue_id,
+                    image: null
 				};
                 formState.isOpen = true
 			}}

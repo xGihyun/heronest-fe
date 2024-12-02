@@ -17,11 +17,15 @@
 	import type { Event } from "$lib/map/event/types";
 	import { toast } from "svelte-sonner";
 	import type { ApiResponse } from "$lib/api/types";
+	import type { User } from "$lib/user/types";
+	import { formatUserName } from "$lib/user/utils";
+	import * as Command from "$lib/components/ui/command/index.js";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateSeatSchema>>;
 		seat: CreateSeatOutput;
 		events: Event[];
+		users: User[];
 	};
 
 	let props: Props = $props();
@@ -65,9 +69,26 @@
 		seatStatusOptions.find((s) => s.value === $formData.status)?.label ??
 			"Select a status"
 	);
+	const eventTriggerContent = $derived(
+		props.events.find((e) => e.event_id === $formData.reserved_by.event_id)
+			?.name ?? "Select an event"
+	);
+	const userTriggerContent = $derived(getUserTriggerContent());
+
+	function getUserTriggerContent(): string {
+		const user = props.users.find(
+			(u) => u.user_id === $formData.reserved_by.user_id
+		);
+
+		if (!user) {
+			return "Select a user";
+		}
+
+		return formatUserName(user);
+	}
 </script>
 
-<form method="POST" action="?/createSeat" use:enhance>
+<form method="POST" action="?/createSeat" use:enhance class="space-y-4">
 	<Form.Field {form} name="seat_id" hidden>
 		<Form.Control>
 			{#snippet children({ props })}
@@ -136,23 +157,52 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if props.seat.reserved_by !== null}
-		<h2 class="font-inter-bold">Reserved By</h2>
+	{#if $formData.status === SeatStatus.Reserved}
+		<h2 class="font-inter-semibold">Reserved By</h2>
 
-		<Form.Field {form} name="reserved_by.metadata">
+		<Form.Field {form} name="reserved_by.metadata" hidden>
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>Reserved by Metadata</Form.Label>
+					<Form.Label>Metadata</Form.Label>
 					<Input {...props} bind:value={$formData.reserved_by.metadata} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Field {form} name="reserved_by.user_id" hidden>
+		<Form.Field {form} name="reserved_by.user_id">
 			<Form.Control>
-				{#snippet children({ props })}
-					<Input {...props} bind:value={$formData.reserved_by.user_id} />
+				{#snippet children({ props: childProps })}
+					<Form.Label>User</Form.Label>
+					<Select.Root
+						type="single"
+						bind:value={$formData.reserved_by.user_id}
+						name={childProps.name}
+					>
+						<Select.Trigger {...childProps}>
+							{userTriggerContent}
+						</Select.Trigger>
+						<Select.Content>
+							<Command.Root>
+								<Command.Input placeholder="Search user..." />
+								<Command.List>
+									<Command.Empty>No users found.</Command.Empty>
+
+									{#each props.users as user (user.user_id)}
+										<Command.Item>
+											{#snippet child({ props: commandProps })}
+												<Select.Item
+													{...commandProps}
+													value={user.user_id}
+													label={formatUserName(user)}
+												></Select.Item>
+											{/snippet}
+										</Command.Item>
+									{/each}
+								</Command.List>
+							</Command.Root>
+						</Select.Content>
+					</Select.Root>
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
@@ -177,7 +227,7 @@
 						name={childProps.name}
 					>
 						<Select.Trigger {...childProps}>
-							{seatStatusTriggerContent}
+							{eventTriggerContent}
 						</Select.Trigger>
 						<Select.Content>
 							{#each props.events as event (event.event_id)}

@@ -1,7 +1,13 @@
 import * as v from "valibot";
 import { SeatStatus } from "./types";
-import { CreateTicketSchema } from "$lib/ticket/schema";
 import { v4 as uuidv4 } from "uuid";
+
+const ReservedTicketSchema = v.object({
+	user_id: v.optional(v.string()),
+	seat_id: v.optional(v.string()),
+	event_id: v.optional(v.string()),
+	metadata: v.nullable(v.any())
+});
 
 export const CreateSeatSchema = v.object({
 	seat_id: v.optional(v.string(), uuidv4()),
@@ -11,7 +17,7 @@ export const CreateSeatSchema = v.object({
 	venue_id: v.pipe(v.string(), v.nonEmpty("Venue is required.")),
 	metadata: v.any(),
 
-	reserved_by: v.nullable(CreateTicketSchema)
+	reserved_by: ReservedTicketSchema
 });
 
 export type CreateSeatInput = v.InferInput<typeof CreateSeatSchema>;

@@ -6,6 +6,7 @@
 	import { handleWheel, handleZoom } from "$lib/map/handlers";
 	import {
 		ArrowDownDropIcon,
+		EventIcon,
 		FileImportIcon,
 		LocationIcon,
 		MinusIcon,
@@ -15,7 +16,6 @@
 	import { Slider } from "$lib/components/ui/slider";
 	import { Button } from "$lib/components/ui/button";
 	import { SLIDER_SCALE } from "$lib/map/constants";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
 	import { handleSave } from "$lib/map/seat/handlers";
 	import { toast } from "svelte-sonner";
 	import { ApiResponseStatus } from "$lib/api/types";
@@ -23,11 +23,11 @@
 	import { v4 as uuidv4 } from "uuid";
 	import { setupEventListeners } from "$lib/map/seat/utils.js";
 	import { selectedSeat } from "./state.svelte.js";
-	import { Input } from "$lib/components/ui/input/index.js";
 	import { SEAT_COLOR } from "$lib/map/seat/constants.js";
-	import type { SelectOption } from "$lib/types.js";
 	import Sidebar from "./sidebar.svelte";
 	import SeatForm from "./seat-form.svelte";
+	import { UserRole } from "$lib/user/types.js";
+	import ReserveForm from "./reserve-form.svelte";
 
 	let { data } = $props();
 
@@ -68,7 +68,13 @@
 		for (const seat of seats) {
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
-			rect.fill(SEAT_COLOR[seat.status]);
+			if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
+				rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+			} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
+				rect.fill(SEAT_COLOR[SeatStatus.Available]);
+			} else {
+				rect.fill(SEAT_COLOR[seat.status]);
+			}
 
 			setupEventListeners(rect, seat, mapContainer);
 			seatsGroup.add(rect);
@@ -96,24 +102,11 @@
 		toast.success(result.message || "Success", { id: toastId });
 	}
 
-	const seatStatusOptions: SelectOption[] = [
-		{
-			value: SeatStatus.Available,
-			label: "Available"
-		},
-		{
-			value: SeatStatus.Unavailable,
-			label: "Unavailable"
-		},
-		{
-			value: SeatStatus.Reserved,
-			label: "Reserved"
-		}
-	];
+	let selectedEventId = $state(data.eventId);
 
-	const seatStatusTriggerContent = $derived(
-		seatStatusOptions.find((s) => s.value === selectedSeat.seat?.status)
-			?.label ?? "Select a status"
+	const eventTriggerContent = $derived(
+		data.events.find((e) => e.event_id === selectedEventId)?.name ??
+			"Select an event"
 	);
 </script>
 
@@ -132,32 +125,45 @@
 			</div>
 		</div>
 
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
-				{#snippet child({ props })}
+		<Select.Root
+			type="single"
+			bind:value={selectedEventId}
+			onValueChange={(value) => {
+				console.log(value);
+			}}
+		>
+			<Select.Trigger>
+				{#snippet child({ props: triggerProps })}
 					<button
-						{...props}
+						{...triggerProps}
 						class="absolute left-2 top-32 z-[11] flex
 		items-center gap-2 rounded-full border-2 border-neutral-400/85
                         bg-neutral-900/85 px-3 py-2
 		text-background shadow"
 					>
-						<LocationIcon class="size-6 text-accent" />
+						<EventIcon class="size-6 text-accent" />
 						<span class="font-inter-medium text-background/80">
-							Events ({data.events.length})
+							{eventTriggerContent}
 						</span>
 						<ArrowDownDropIcon class="size-6" />
 					</button>
 				{/snippet}
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-full max-w-96">
+			</Select.Trigger>
+			<Select.Content>
 				{#each data.events as event (event.event_id)}
-					<DropdownMenu.Item class="w-full cursor-pointer font-inter-medium">
-						{event.name}
-					</DropdownMenu.Item>
+					<Select.Item value={event.event_id} label={event.name}>
+						{#snippet child({ props: itemProps })}
+							<a
+								{...itemProps}
+								href={`/venues/${data.venueId}/map?eventId=${event.event_id}`}
+							>
+								{event.name}
+							</a>
+						{/snippet}
+					</Select.Item>
 				{/each}
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+			</Select.Content>
+		</Select.Root>
 
 		<div
 			bind:this={mapContainer}
@@ -217,77 +223,79 @@
 				</Button>
 			</div>
 
-			<Button
-				class="absolute right-44 h-auto
-                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
-                shadow"
-				onclick={() => svgInput?.click()}
-			>
-				<FileImportIcon class="size-4" />
-				Import
-			</Button>
-
-			<Button
-				class="absolute right-20 h-auto
-                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
-                shadow"
-				onclick={saveSeats}
-			>
-				<SaveIcon class="size-4" />
-				Save
-			</Button>
-		</div>
-
-		<input
-			type="file"
-			accept=".svg"
-			hidden
-			bind:this={svgInput}
-			onchange={(e) => {
-				const file = e.currentTarget.files?.[0];
-				if (!file) {
-					return;
-				}
-
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					if (!stage) {
-						console.warn("Canvas stage not found.");
-						return;
-					}
-
-					const svgContent = event.target?.result;
-
-					if (!svgContent) {
-						console.warn("SVG content not found.");
-						return;
-					}
-
-					loadFromSvg(svgContent.toString(), seatsGroup);
-					setupMap(stage, layer, seatsGroup);
-
-					seatsGroup.find(".seat").forEach((node, i) => {
-						if (!mapContainer) {
+			{#if data.user?.role === UserRole.Admin}
+				<input
+					type="file"
+					accept=".svg"
+					hidden
+					bind:this={svgInput}
+					onchange={(e) => {
+						const file = e.currentTarget.files?.[0];
+						if (!file) {
 							return;
 						}
 
-						const rect = node as Konva.Rect;
+						const reader = new FileReader();
+						reader.onload = (event) => {
+							if (!stage) {
+								console.warn("Canvas stage not found.");
+								return;
+							}
 
-						const seat: Seat = {
-							seat_id: uuidv4(),
-							status: SeatStatus.Unavailable,
-							venue_id: data.venueId,
-							metadata: JSON.parse(rect.toJSON()),
-							seat_number: `${i + 1}`
+							const svgContent = event.target?.result;
+
+							if (!svgContent) {
+								console.warn("SVG content not found.");
+								return;
+							}
+
+							loadFromSvg(svgContent.toString(), seatsGroup);
+							setupMap(stage, layer, seatsGroup);
+
+							seatsGroup.find(".seat").forEach((node, i) => {
+								if (!mapContainer) {
+									return;
+								}
+
+								const rect = node as Konva.Rect;
+
+								const seat: Seat = {
+									seat_id: uuidv4(),
+									status: SeatStatus.Unavailable,
+									venue_id: data.venueId,
+									metadata: JSON.parse(rect.toJSON()),
+									seat_number: `${i + 1}`
+								};
+
+								seats.push(seat);
+								setupEventListeners(rect, seat, mapContainer);
+							});
 						};
+						reader.readAsText(file);
+					}}
+				/>
 
-						seats.push(seat);
-						setupEventListeners(rect, seat, mapContainer);
-					});
-				};
-				reader.readAsText(file);
-			}}
-		/>
+				<Button
+					class="absolute right-44 h-auto
+                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
+                shadow"
+					onclick={() => svgInput?.click()}
+				>
+					<FileImportIcon class="size-4" />
+					Import
+				</Button>
+
+				<Button
+					class="absolute right-20 h-auto
+                w-auto rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2
+                shadow"
+					onclick={saveSeats}
+				>
+					<SaveIcon class="size-4" />
+					Save
+				</Button>
+			{/if}
+		</div>
 
 		<Dialog.Root
 			open={selectedSeat.seat !== null}
@@ -299,60 +307,44 @@
 		>
 			<Dialog.Content>
 				{#if selectedSeat.seat !== null}
-					<SeatForm
-						form={data.form}
-						seat={{
-							seat_id: selectedSeat.seat.seat_id,
-							seat_number: selectedSeat.seat.seat_number,
-							status: selectedSeat.seat.status,
-							venue_id: data.venueId,
-							metadata: selectedSeat.seat.metadata,
-							seat_section_id: selectedSeat.seat.seat_section_id || null,
-							reserved_by: selectedSeat.seat.reserved_by ? {
-								seat_id: selectedSeat.seat.seat_id,
-								metadata: null,
-								user_id: selectedSeat.seat.reserved_by?.user.user_id || "",
-								event_id: selectedSeat.seat.reserved_by?.event.event_id || ""
-							} : null
-						}}
-						events={data.events}
-					/>
 					<Dialog.Header>
 						<Dialog.Title>
+							{#if data.user?.role !== UserRole.Admin}
+								Reserve
+							{/if}
 							Seat
 							{selectedSeat.seat.seat_number}
 						</Dialog.Title>
 					</Dialog.Header>
 
-					<Input
-						bind:value={selectedSeat.seat.seat_number}
-						name="seat_number"
-					/>
-
-					<Select.Root
-						type="single"
-						name="status"
-						bind:value={selectedSeat.seat.status}
-						onValueChange={(value) => {
-							if (selectedSeat.rect === null) {
-								return;
-							}
-							selectedSeat.rect.fill(SEAT_COLOR[value as SeatStatus]);
-						}}
-					>
-						<Select.Trigger>
-							{seatStatusTriggerContent}
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Group>
-								<Select.GroupHeading>Status</Select.GroupHeading>
-								{#each seatStatusOptions as status (status.value)}
-									<Select.Item value={status.value} label={status.label}
-									></Select.Item>
-								{/each}
-							</Select.Group>
-						</Select.Content>
-					</Select.Root>
+					{#if data.user?.role === UserRole.Admin}
+						<SeatForm
+							form={data.form}
+							seat={{
+								seat_id: selectedSeat.seat.seat_id,
+								seat_number: selectedSeat.seat.seat_number,
+								status: selectedSeat.seat.status,
+								venue_id: data.venueId,
+								metadata: selectedSeat.seat.metadata,
+								seat_section_id: selectedSeat.seat.seat_section_id || null,
+								reserved_by: {
+									seat_id: selectedSeat.seat.seat_id,
+									metadata: null,
+									user_id: selectedSeat.seat.reserved_by?.user.user_id || "",
+									event_id: selectedSeat.seat.reserved_by?.event.event_id || ""
+								}
+							}}
+							events={data.events}
+							users={data.users}
+						/>
+					{:else}
+						<ReserveForm
+							form={data.ticketForm}
+							seat={selectedSeat.seat}
+							events={data.events}
+							user={data.user}
+						/>
+					{/if}
 				{/if}
 			</Dialog.Content>
 		</Dialog.Root>

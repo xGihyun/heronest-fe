@@ -1,6 +1,5 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import type { ApiResponse } from "$lib/api/types";
-import type { Venue } from "$lib/map/venue/types";
 import { fail, superValidate } from "sveltekit-superforms";
 import type { PageServerLoad } from "./$types";
 import { valibot } from "sveltekit-superforms/adapters";

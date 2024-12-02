@@ -1,8 +1,13 @@
+import { ApiResponseStatus } from "$lib/api/types";
 import { getUser } from "$lib/user/requests";
-import type { Handle } from "@sveltejs/kit";
+import { redirect, type Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const session = event.cookies.get("session");
+
+    if(!session && !event.route.id?.startsWith("/(auth)")) {
+        throw redirect(302, "/login")
+    }
 
     if(!session) {
         console.warn("Session not found.")
@@ -10,6 +15,12 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     const user = await getUser(session)
+
+    if(user.status !== ApiResponseStatus.Success) {
+        console.error(user.message)
+        return new Response(user.message)
+    }
+
     event.locals.user = user.data
 
 	const response = await resolve(event);

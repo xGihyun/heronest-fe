@@ -67,7 +67,13 @@ export function setupEventListeners(
 			return;
 		}
 
-		rect.fill(SEAT_COLOR[seat.status]);
+		if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
+			rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+		} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
+			rect.fill(SEAT_COLOR[SeatStatus.Available]);
+		} else {
+			rect.fill(SEAT_COLOR[seat.status]);
+		}
 		mapContainer.style.cursor = "default";
 	});
 }

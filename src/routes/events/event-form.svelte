@@ -47,12 +47,12 @@
 				toast.success(result.message || "Success.", { id: toastId });
 			}
 		},
-        resetForm: false
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
 
-	if (formState.data) {
+	if (formState.data !== null) {
 		$formData = formState.data;
 	}
 
@@ -76,14 +76,37 @@
 	);
 </script>
 
-<form method="POST" {action} use:enhance>
+<form method="POST" {action} enctype="multipart/form-data" use:enhance>
 	<Form.Field {form} name="event_id" hidden>
 		<Form.Control>
 			{#snippet children({ props })}
 				<Input {...props} bind:value={$formData.event_id} />
 			{/snippet}
 		</Form.Control>
+	</Form.Field>
+
+	<Form.Field {form} name="image">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Image</Form.Label>
+				<input
+					type="file"
+					{...props}
+					oninput={(e) => {
+						$formData.image = e.currentTarget.files?.item(0) || null;
+					}}
+				/>
+			{/snippet}
+		</Form.Control>
 		<Form.FieldErrors />
+	</Form.Field>
+
+	<Form.Field {form} name="image_url" hidden>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Input {...props} bind:value={$formData.image_url} />
+			{/snippet}
+		</Form.Control>
 	</Form.Field>
 
 	<Form.Field {form} name="name">
@@ -133,6 +156,7 @@
 									)
 								: undefined}
 							minValue={new CalendarDate(1900, 1, 1)}
+                            maxValue={new CalendarDate(2100, 1, 1)}
 							calendarLabel="Event start"
 							onValueChange={(v) => {
 								if (!v) {

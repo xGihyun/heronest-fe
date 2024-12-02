@@ -1,12 +1,20 @@
 import * as v from "valibot";
 
 export const CreateEventSchema = v.object({
-    event_id: v.optional(v.string()),
-    name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	event_id: v.optional(v.string()),
+	name: v.pipe(v.string(), v.nonEmpty()),
+	description: v.nullable(v.string()),
 	start_at: v.optional(v.date(), () => new Date()),
 	end_at: v.optional(v.date(), () => new Date()),
-	venue_id: v.pipe(v.string(), v.nonEmpty())
+	venue_id: v.pipe(v.string(), v.nonEmpty()),
+	image_url: v.optional(v.string()),
+	image: v.nullable(
+		v.pipe(
+			v.file("Please select an image file."),
+			v.mimeType(["image/jpeg", "image/png", "image/webp", "image/avif"])
+		)
+	)
+	//image: v.optional(v.file())
 });
 
 export type CreateEventInput = v.InferInput<typeof CreateEventSchema>;

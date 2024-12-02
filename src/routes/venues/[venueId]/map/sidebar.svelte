@@ -4,6 +4,7 @@
 	import type { Venue } from "$lib/map/venue/types";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { SeatStatus, type Seat } from "$lib/map/seat/types";
+	import { selectedSeat } from "./state.svelte";
 
 	type Props = {
 		venues: Venue[];
@@ -49,9 +50,12 @@
                 divide-foreground/20 overflow-y-scroll"
 			>
 				{#each props.seats as seat (seat.seat_id)}
-					<div class={`flex items-center gap-2 px-3 py-2`}>
+					<button
+						class={`flex items-center gap-2 px-3 py-2 duration-300 hover:bg-background`}
+                        onclick={() => selectedSeat.seat = seat}
+					>
 						<GeminiIcon class="size-3" />
-						<div>
+						<div class="flex flex-col items-start">
 							Seat {seat.seat_number}
 							<p class="text-xs text-muted-foreground first-letter:uppercase">
 								{seat.status}
@@ -65,7 +69,7 @@
 								{/if}
 							</p>
 						</div>
-					</div>
+					</button>
 				{/each}
 			</div>
 		</Tabs.Content>

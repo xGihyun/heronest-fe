@@ -6,38 +6,42 @@
 	import { buttonVariants } from "$lib/components/ui/button";
 	import { getFormState } from "./state.svelte";
 	import { FormAction } from "$lib/types";
+	import { UserRole } from "$lib/user/types";
 
 	let { data } = $props();
 
 	const formState = getFormState();
 </script>
 
-<Dialog.Root
-	bind:open={formState.isOpen}
-	onOpenChange={(open) => {
-		if (!open) {
-			formState.reset();
-		}
-	}}
->
-	<Dialog.Trigger class={buttonVariants({ variant: "default" })}>
-		Create
-	</Dialog.Trigger>
-	<Dialog.Content>
-		<Dialog.Header>
-			<Dialog.Title>
-				{#if formState.action === FormAction.Create}
-					Create
-				{:else}
-					Edit
-				{/if}
-				Venue
-			</Dialog.Title>
-			<Dialog.Description>Enter the venue's details below.</Dialog.Description>
-		</Dialog.Header>
+{#if data.user?.role === UserRole.Admin}
+	<Dialog.Root
+		bind:open={formState.isOpen}
+		onOpenChange={(open) => {
+			if (!open) {
+				formState.reset();
+			}
+		}}
+	>
+		<Dialog.Trigger class={buttonVariants({ variant: "default" })}>
+			Create
+		</Dialog.Trigger>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>
+					{#if formState.action === FormAction.Create}
+						Create
+					{:else}
+						Edit
+					{/if}
+					Venue
+				</Dialog.Title>
+				<Dialog.Description>Enter the venue's details below.</Dialog.Description
+				>
+			</Dialog.Header>
 
-		<VenueForm form={data.form} />
-	</Dialog.Content>
-</Dialog.Root>
+			<VenueForm form={data.form} />
+		</Dialog.Content>
+	</Dialog.Root>
+{/if}
 
-<DataTable data={data.venues} {columns} />
+<DataTable data={data.venues} {columns} user={data.user} />
