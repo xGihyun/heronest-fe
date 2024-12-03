@@ -9,6 +9,7 @@
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { toast } from "svelte-sonner";
+	import type { ApiResponse } from "$lib/api/types";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof LoginSchema>>;
@@ -29,8 +30,16 @@
 				return;
 			}
 
+			if (event.result.type === "success") {
+				const result: ApiResponse = event.result.data?.result;
+
+				toast.error(result.message || "Error during login.", { id: toastId });
+                return
+			}
+
 			console.debug("Unexpected result type: " + event.result.type);
-		}
+		},
+        resetForm: false
 	});
 
 	const { form: formData, enhance } = form;

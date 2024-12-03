@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, RotationTypes, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
-import fs from "fs/promises";
+import * as fs from "fs";
+import * as path from "path";
 import type { GetTicketResponse } from "./types";
 import { formatUserName } from "$lib/user/utils";
 import { DateFormatter } from "@internationalized/date";
@@ -8,52 +9,8 @@ import { DateFormatter } from "@internationalized/date";
 export async function generateTicketPdf(
 	templatePath: string,
 	outputPath: string,
-	ticket: GetTicketResponse
-) {
-	const buffer = await fs.readFile(templatePath);
-	const bytes = Uint8Array.from(buffer);
-	const pdfDoc = await PDFDocument.load(bytes);
-
-	const page = pdfDoc.getPage(0);
-	const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-	const pdfWidth = page.getWidth();
-	const pdfHeight = page.getHeight();
-
-	const namePosition = { x: pdfWidth - 300, y: pdfHeight - 100 };
-	const qrPosition = { x: 50, y: pdfHeight - 150 };
-	const qrWidth = 100;
-	const qrHeight = 100;
-
-	page.drawText(`${formatUserName(ticket.user)}`, {
-		x: namePosition.x,
-		y: namePosition.y,
-		size: 12,
-		font,
-		color: rgb(0, 0, 0)
-	});
-
-	const qrDataURL = await QRCode.toDataURL(ticket.ticket_number);
-	const qrImageBytes = await fetch(qrDataURL).then((res) => res.arrayBuffer());
-	const qrImage = await pdfDoc.embedPng(qrImageBytes);
-
-	page.drawImage(qrImage, {
-		x: qrPosition.x,
-		y: qrPosition.y,
-		width: qrWidth,
-		height: qrHeight
-	});
-
-	const modifiedPdfBytes = await pdfDoc.save();
-	await fs.writeFile(outputPath, modifiedPdfBytes);
-
-	console.log(`Ticket saved to ${outputPath}`);
-}
-
-export async function generateTicketPdfClient(
-	templatePath: string,
-	outputPath: string,
-	ticket: GetTicketResponse
+	ticket: GetTicketResponse,
+	fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 ) {
 	const templateBytes = await fetch(templatePath).then((res) =>
 		res.arrayBuffer()
@@ -68,7 +25,7 @@ export async function generateTicketPdfClient(
 	const pdfHeight = page.getHeight();
 
 	const darkBlueRgb = rgb(0.11, 0.13, 0.34);
-	const yellowRgb = rgb(1, 0.97, 0.34)
+	const yellowRgb = rgb(1, 0.97, 0.34);
 
 	// The details on the right side
 	page.drawText(formatUserName(ticket.user), {
@@ -125,7 +82,7 @@ export async function generateTicketPdfClient(
 		color: darkBlueRgb
 	});
 
-    const venueNameWidth = font.widthOfTextAtSize(ticket.venue.name, 12)
+	const venueNameWidth = font.widthOfTextAtSize(ticket.venue.name, 12);
 
 	page.drawText(ticket.venue.name, {
 		x: pdfWidth - 110 - venueNameWidth,
@@ -135,8 +92,10 @@ export async function generateTicketPdfClient(
 		color: yellowRgb
 	});
 
-
-    const ticketNumberWidth = boldFont.widthOfTextAtSize(ticket.ticket_number, 16)
+	const ticketNumberWidth = boldFont.widthOfTextAtSize(
+		ticket.ticket_number,
+		16
+	);
 
 	page.drawText(ticket.ticket_number, {
 		x: pdfWidth - 110 - ticketNumberWidth,
@@ -167,10 +126,13 @@ export async function generateTicketPdfClient(
 		dateStyle: "long"
 	});
 
-	const eventDate = df.formatRange(
-		new Date(ticket.event.start_at),
-		new Date(ticket.event.end_at)
-	);
+	// TODO: Fix this bug
+	//const eventDate = df.formatRange(
+	//	new Date(ticket.event.start_at),
+	//	new Date(ticket.event.end_at)
+	//);
+
+	const eventDate = df.format(new Date(ticket.event.start_at));
 
 	page.drawText(eventDate, {
 		x: namePosition.x,
@@ -186,10 +148,7 @@ export async function generateTicketPdfClient(
 		hour12: true
 	});
 
-	const eventTime = timeFormatter.formatRange(
-		new Date(ticket.event.start_at),
-		new Date(ticket.event.end_at)
-	);
+	const eventTime = timeFormatter.format(new Date(ticket.event.start_at));
 
 	page.drawText(eventTime, {
 		x: namePosition.x,
@@ -218,11 +177,19 @@ export async function generateTicketPdfClient(
 
 	const modifiedPdfBytes = await pdfDoc.save();
 
-	const blob = new Blob([modifiedPdfBytes], { type: "application/pdf" });
-	const downloadLink = document.createElement("a");
-	downloadLink.href = URL.createObjectURL(blob);
-	downloadLink.download = "ticket.pdf";
-	document.body.appendChild(downloadLink);
-	downloadLink.click();
-	document.body.removeChild(downloadLink);
+	if (!fs.existsSync(outputPath)) {
+		fs.mkdirSync(outputPath, { recursive: true });
+	}
+
+	const fileName = `${ticket.ticket_number}.pdf`;
+	const filePath = path.join(outputPath, fileName);
+	await fs.promises.writeFile(filePath, modifiedPdfBytes);
+
+	//const blob = new Blob([modifiedPdfBytes], { type: "application/pdf" });
+	//const downloadLink = document.createElement("a");
+	//downloadLink.href = URL.createObjectURL(blob);
+	//downloadLink.download = "ticket.pdf";
+	//document.body.appendChild(downloadLink);
+	//downloadLink.click();
+	//document.body.removeChild(downloadLink);
 }

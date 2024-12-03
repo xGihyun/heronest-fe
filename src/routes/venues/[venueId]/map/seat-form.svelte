@@ -12,14 +12,14 @@
 		superForm
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
-	import type { SelectOption } from "$lib/types";
 	import { SeatStatus } from "$lib/map/seat/types";
 	import type { Event } from "$lib/map/event/types";
 	import { toast } from "svelte-sonner";
-	import type { ApiResponse } from "$lib/api/types";
+	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 	import type { User } from "$lib/user/types";
 	import { formatUserName } from "$lib/user/utils";
 	import * as Command from "$lib/components/ui/command/index.js";
+	import { SEAT_STATUS_OPTIONS } from "$lib/map/seat/constants";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateSeatSchema>>;
@@ -40,8 +40,19 @@
 		onResult: (event) => {
 			if (event.result.type === "success") {
 				const result: ApiResponse = event.result.data?.result;
-				toast.success(result.message || "Success.", { id: toastId });
+
+                // TODO: Fix this pls
+				if (result.status !== ApiResponseStatus.Success) {
+					toast.error("User has an existing reservation.", { id: toastId });
+				} else {
+					toast.success(result.message || "Success.", { id: toastId });
+				}
+			} else if (event.result.type === "failure") {
+				toast.error("Please select a user and an event when reserving.", {
+					id: toastId
+				});
 			}
+			console.log(event.result);
 		},
 		resetForm: false
 	});
@@ -50,23 +61,8 @@
 
 	$formData = props.seat;
 
-	const seatStatusOptions: SelectOption[] = [
-		{
-			value: SeatStatus.Available,
-			label: "Available"
-		},
-		{
-			value: SeatStatus.Unavailable,
-			label: "Unavailable"
-		},
-		{
-			value: SeatStatus.Reserved,
-			label: "Reserved"
-		}
-	];
-
 	const seatStatusTriggerContent = $derived(
-		seatStatusOptions.find((s) => s.value === $formData.status)?.label ??
+		SEAT_STATUS_OPTIONS.find((s) => s.value === $formData.status)?.label ??
 			"Select a status"
 	);
 	const eventTriggerContent = $derived(
@@ -146,7 +142,7 @@
 						{seatStatusTriggerContent}
 					</Select.Trigger>
 					<Select.Content>
-						{#each seatStatusOptions as status (status.value)}
+						{#each SEAT_STATUS_OPTIONS as status (status.value)}
 							<Select.Item value={status.value} label={status.label}
 							></Select.Item>
 						{/each}

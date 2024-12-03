@@ -13,13 +13,16 @@
 	import { SeatStatus, type Seat } from "$lib/map/seat/types";
 	import { v4 as uuidv4 } from "uuid";
 	import { setupEventListeners } from "$lib/map/seat/utils";
+	import type { User } from "$lib/user/types";
 
+    // NOTE: This is not used
 	type Props = {
 		mapContainer: HTMLDivElement;
 		stage: Stage;
 		layer: Layer;
 		group: Group;
 		venueId: string;
+        user: User
 	};
 
 	let props: Props = $props();
@@ -74,7 +77,7 @@
 				};
 
 				mapState.seats.push(seat);
-				setupEventListeners(rect, seat, props.mapContainer);
+				setupEventListeners(rect, seat, props.mapContainer, props.user);
 			});
 		};
 		reader.readAsText(file);

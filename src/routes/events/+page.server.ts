@@ -12,8 +12,9 @@ import { convertToSlug, saveFile } from "$lib/utils";
 export const load: PageServerLoad = async ({ url }) => {
 	const page = url.searchParams.get("page") || "1";
 	const limit = url.searchParams.get("limit") || "10";
+	const name = url.searchParams.get("name") || undefined;
 
-	const events = await getEvents({ page, limit });
+	const events = await getEvents({ page, limit, name });
 	const venues = await getVenues();
 
 	return {

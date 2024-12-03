@@ -11,8 +11,13 @@ export async function getUser(userId: string): Promise<ApiResponse<User>> {
 	return result;
 }
 
+
+type GetUserFilter = {
+	name?: string;
+} & PaginationResult;
+
 export async function getUsers(
-	filter?: PaginationResult
+	filter?: GetUserFilter
 ): Promise<ApiResponse<User[]>> {
 	const params = new URLSearchParams();
 	const endpoint = `${PUBLIC_BACKEND_URL}/api/users`;
@@ -23,6 +28,9 @@ export async function getUsers(
 		}
 		if (filter.limit) {
 			params.set("limit", String(filter.limit));
+		}
+		if (filter.name) {
+			params.set("name", String(filter.name));
 		}
 	}
 

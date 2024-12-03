@@ -3,9 +3,9 @@ import { SeatStatus } from "./types";
 import { v4 as uuidv4 } from "uuid";
 
 const ReservedTicketSchema = v.object({
-	user_id: v.optional(v.string()),
-	seat_id: v.optional(v.string()),
-	event_id: v.optional(v.string()),
+	user_id: v.string(),
+	seat_id: v.string(),
+	event_id: v.string(),
 	metadata: v.nullable(v.any())
 });
 

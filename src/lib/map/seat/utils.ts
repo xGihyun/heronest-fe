@@ -3,6 +3,7 @@ import { parseTransform } from "../utils";
 import { SeatStatus, type Seat } from "./types";
 import { selectedSeat } from "../../../routes/venues/[venueId]/map/state.svelte";
 import { SEAT_COLOR } from "./constants";
+import type { User } from "$lib/user/types";
 
 export function createSeatFromSvg(rect: SVGRectElement): Rect {
 	let x = parseFloat(rect.getAttribute("x") || "0");
@@ -47,7 +48,8 @@ export function createSeatFromSvg(rect: SVGRectElement): Rect {
 export function setupEventListeners(
 	rect: Rect,
 	seat: Seat,
-	mapContainer: HTMLDivElement
+	mapContainer: HTMLDivElement,
+	user: User
 ) {
 	rect.on("click", () => {
 		selectedSeat.seat = seat;
@@ -68,7 +70,11 @@ export function setupEventListeners(
 		}
 
 		if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
-			rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+			if (seat.reserved_by.user.user_id === user.user_id) {
+				rect.fill(SEAT_COLOR.reserved_current_user);
+			} else {
+				rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+			}
 		} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
 			rect.fill(SEAT_COLOR[SeatStatus.Available]);
 		} else {

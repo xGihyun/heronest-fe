@@ -4,6 +4,7 @@ import type { Event } from "./types";
 
 type GetEventFilter = {
 	venue_id?: string;
+    name?: string;
 } & PaginationResult;
 
 export async function getEvents(
@@ -21,6 +22,9 @@ export async function getEvents(
 		}
 		if (filter.venue_id) {
 			params.set("venueId", String(filter.venue_id));
+		}
+		if (filter.name) {
+			params.set("name", String(filter.name));
 		}
 	}
 

@@ -26,7 +26,7 @@
 		</Tabs.List>
 
 		<Tabs.Content value="venues">
-			<div class="flex flex-col divide-y divide-foreground/20">
+			<div class="flex flex-col h-[40rem] divide-y divide-foreground/20">
 				{#each props.venues as venue (venue.venue_id)}
 					{@const isActive = $page.url.pathname.includes(venue.venue_id)}
 					<a
@@ -45,33 +45,40 @@
 		</Tabs.Content>
 
 		<Tabs.Content value="seats">
-			<div
-				class="flex h-96 flex-col divide-y
+			{#if props.seats.length === 0}
+				<p class="text-muted-foreground text-center">No seats available.</p>
+			{:else}
+				<div
+					class="flex h-[40rem] flex-col divide-y
                 divide-foreground/20 overflow-y-scroll"
-			>
-				{#each props.seats as seat (seat.seat_id)}
-					<button
-						class={`flex items-center gap-2 px-3 py-2 duration-300 hover:bg-background`}
-                        onclick={() => selectedSeat.seat = seat}
-					>
-						<GeminiIcon class="size-3" />
-						<div class="flex flex-col items-start">
-							Seat {seat.seat_number}
-							<p class="text-xs text-muted-foreground first-letter:uppercase">
-								{seat.status}
+				>
+					{#each props.seats as seat (seat.seat_id)}
+						<button
+							class={`flex items-center gap-2 px-3 py-2 duration-300 hover:bg-background`}
+							onclick={() => (selectedSeat.seat = seat)}
+						>
+							<GeminiIcon class="size-3" />
+							<div class="flex flex-col items-start">
+								Seat {seat.seat_number}
+								<p class="text-xs text-muted-foreground first-letter:uppercase">
+									{seat.status}
 
-								{#if seat.status === SeatStatus.Reserved && seat.reserved_by}
-									by
-									<span class="font-inter-semibold">
-										{seat.reserved_by.user.first_name}
-										{seat.reserved_by.user.last_name}
-									</span>
-								{/if}
-							</p>
-						</div>
-					</button>
-				{/each}
-			</div>
+									{#if seat.status === SeatStatus.Reserved && seat.reserved_by}
+										by
+										<span class="font-inter-semibold">
+											{seat.reserved_by.user.first_name}
+											{seat.reserved_by.user.last_name}
+										</span>
+									{/if}
+								</p>
+							</div>
+						</button>
+					{/each}
+				</div>
+			{/if}
+
+            <div>
+            </div>
 		</Tabs.Content>
 	</Tabs.Root>
 </aside>

@@ -10,9 +10,10 @@ export const selectedSeat = $state<{ seat: Seat | null; rect: Rect | null }>({
 type MapState = {
 	scale: number;
 	seats: Seat[];
+    mapContainer?: HTMLDivElement;
 };
 
 export const mapState = $state<MapState>({
 	scale: SLIDER_SCALE.initial,
-	seats: []
+	seats: [],
 });

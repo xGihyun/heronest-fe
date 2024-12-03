@@ -93,7 +93,8 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="image_url">
+    <!-- TODO: Add this! -->
+	<Form.Field {form} name="image_url" hidden>
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Image</Form.Label>

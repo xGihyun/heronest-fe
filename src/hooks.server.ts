@@ -18,7 +18,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     if(user.status !== ApiResponseStatus.Success) {
         console.error(user.message)
-        return new Response(user.message)
+        return await resolve(event)
     }
 
     event.locals.user = user.data

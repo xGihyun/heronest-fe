@@ -5,6 +5,7 @@
 	import { getFormState } from "./state.svelte";
 	import { FormAction } from "$lib/types";
 	import type { User } from "$lib/user/types";
+	import { EditIcon } from "$lib/icons";
 
 	type Props = {
 		user: User;
@@ -38,11 +39,13 @@
 				formState.data = {
 					...props.user,
 					birth_date: new Date(props.user.birth_date),
-					password: "password"
+					password: "",
+                    middle_name: props.user.middle_name || null
 				};
 				formState.isOpen = true;
 			}}
 		>
+            <EditIcon class="size-4" />
 			Edit
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>

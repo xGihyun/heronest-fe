@@ -1,47 +1,14 @@
 <script lang="ts">
 	import { columns } from "./columns";
 	import DataTable from "./data-table.svelte";
-	import VenueForm from "./form.svelte";
-	import * as Dialog from "$lib/components/ui/dialog/index";
-	import { buttonVariants } from "$lib/components/ui/button";
-	import { getFormState } from "./state.svelte";
-	import { FormAction } from "$lib/types";
-	import { UserRole } from "$lib/user/types";
+	import Actions from "./actions.svelte";
 
 	let { data } = $props();
-
-	const formState = getFormState();
 </script>
 
-{#if data.user?.role === UserRole.Admin}
-	<Dialog.Root
-		bind:open={formState.isOpen}
-		onOpenChange={(open) => {
-			if (!open) {
-				formState.reset();
-			}
-		}}
-	>
-		<Dialog.Trigger class={buttonVariants({ variant: "default" })}>
-			Create
-		</Dialog.Trigger>
-		<Dialog.Content>
-			<Dialog.Header>
-				<Dialog.Title>
-					{#if formState.action === FormAction.Create}
-						Create
-					{:else}
-						Edit
-					{/if}
-					Venue
-				</Dialog.Title>
-				<Dialog.Description>Enter the venue's details below.</Dialog.Description
-				>
-			</Dialog.Header>
+<div class="mx-auto max-w-screen-lg">
+	<h1 class="mb-4 font-inter-bold text-3xl">Venues</h1>
 
-			<VenueForm form={data.form} />
-		</Dialog.Content>
-	</Dialog.Root>
-{/if}
-
-<DataTable data={data.venues} {columns} user={data.user} />
+	<Actions form={data.form} />
+	<DataTable data={data.venues} {columns} user={data.user} />
+</div>

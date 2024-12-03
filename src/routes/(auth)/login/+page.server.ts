@@ -3,7 +3,7 @@ import { valibot } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
 import { redirect, type Actions } from "@sveltejs/kit";
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse } from "$lib/api/types";
+import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 import type { User } from "$lib/user/types";
 import { LoginSchema } from "./schema";
 
@@ -31,6 +31,15 @@ export const actions: Actions = {
 		});
 
 		const result: ApiResponse<User> = await response.json();
+
+        console.log(result)
+
+        if(result.status !== ApiResponseStatus.Success) {
+            return {
+                form,
+                result
+            }
+        }
 
 		event.cookies.set("session", result.data.user_id, {
 			path: "/",

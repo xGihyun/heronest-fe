@@ -1,9 +1,12 @@
 import LocationIcon from "virtual:icons/mdi/location";
 import UsersIcon from "virtual:icons/mdi/users";
+import ClockIcon from "virtual:icons/mdi/clock";
+import FileDownloadIcon from "virtual:icons/ic/round-file-download";
 
 import ArrowDownDropIcon from "virtual:icons/mynaui/chevron-down-solid";
 
 import HomeIcon from "virtual:icons/ic/round-home";
+import SearchIcon from "virtual:icons/ic/round-search";
 import MapIcon from "virtual:icons/ic/round-map";
 import EventIcon from "virtual:icons/ic/round-event";
 import MinusIcon from "virtual:icons/ic/round-minus";
@@ -14,6 +17,8 @@ import GeminiIcon from "virtual:icons/lineicons/gemini";
 
 import WarningIcon from "virtual:icons/mingcute/warning-fill";
 import FileImportIcon from "virtual:icons/mingcute/file-import-fill";
+
+import EditIcon from "virtual:icons/lucide/edit"
 
 export {
 	LocationIcon,
@@ -27,5 +32,9 @@ export {
 	SaveIcon,
 	GeminiIcon,
 	WarningIcon,
-    FileImportIcon
+    FileImportIcon,
+    ClockIcon,
+    SearchIcon,
+    EditIcon,
+    FileDownloadIcon
 };

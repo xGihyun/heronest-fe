@@ -10,8 +10,9 @@ import { getUsers } from "$lib/user/requests";
 export const load: PageServerLoad = async ({ url }) => {
 	const page = url.searchParams.get("page") || "1";
 	const limit = url.searchParams.get("limit") || "10";
+	const name = url.searchParams.get("name") || undefined;
 
-	const users = await getUsers({ page, limit });
+	const users = await getUsers({ page, limit, name });
 
 	return {
 		venues: users.data,

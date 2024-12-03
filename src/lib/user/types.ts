@@ -14,6 +14,7 @@ export type User = {
 	user_id: string;
 	email: string;
 	role: UserRole;
+    avatar_url: string | null;
 } & UserDetail;
 
 export type UserDetail = {

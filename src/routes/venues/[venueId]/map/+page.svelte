@@ -69,14 +69,18 @@
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
 			if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
-				rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+				if (seat.reserved_by.user.user_id === data.user?.user_id) {
+					rect.fill(SEAT_COLOR.reserved_current_user);
+				} else {
+					rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
+				}
 			} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
 				rect.fill(SEAT_COLOR[SeatStatus.Available]);
 			} else {
 				rect.fill(SEAT_COLOR[seat.status]);
 			}
 
-			setupEventListeners(rect, seat, mapContainer);
+			setupEventListeners(rect, seat, mapContainer, data.user);
 			seatsGroup.add(rect);
 		}
 
@@ -136,22 +140,29 @@
 				{#snippet child({ props: triggerProps })}
 					<button
 						{...triggerProps}
-						class="absolute left-2 top-32 z-[11] flex
-		items-center gap-2 rounded-full border-2 border-neutral-400/85
-                        bg-neutral-900/85 px-3 py-2
-		text-background shadow"
+						class="absolute left-2 top-32 z-[11] flex w-full max-w-72 items-center justify-between gap-2
+                        rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
 					>
-						<EventIcon class="size-6 text-accent" />
-						<span class="font-inter-medium text-background/80">
-							{eventTriggerContent}
-						</span>
+						<div class="flex items-center gap-2">
+							<EventIcon class="size-6 text-accent" />
+							<p
+								class="line-clamp-1 text-start
+                                font-inter-medium text-background/80"
+							>
+								{eventTriggerContent}
+							</p>
+						</div>
 						<ArrowDownDropIcon class="size-6" />
 					</button>
 				{/snippet}
 			</Select.Trigger>
 			<Select.Content>
 				{#each data.events as event (event.event_id)}
-					<Select.Item value={event.event_id} label={event.name}>
+					<Select.Item
+						value={event.event_id}
+						label={event.name}
+						class="hover:cursor-pointer"
+					>
 						{#snippet child({ props: itemProps })}
 							<a
 								{...itemProps}
@@ -268,7 +279,7 @@
 								};
 
 								seats.push(seat);
-								setupEventListeners(rect, seat, mapContainer);
+								setupEventListeners(rect, seat, mapContainer, data.user);
 							});
 						};
 						reader.readAsText(file);

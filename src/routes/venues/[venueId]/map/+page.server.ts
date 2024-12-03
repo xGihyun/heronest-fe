@@ -6,10 +6,20 @@ import { valibot } from "sveltekit-superforms/adapters";
 import { fail, superValidate } from "sveltekit-superforms";
 import { CreateSeatSchema } from "$lib/map/seat/schema";
 import type { Actions } from "@sveltejs/kit";
-import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse } from "$lib/api/types";
+import {
+	PUBLIC_BACKEND_URL,
+	PUBLIC_STORAGE_DIRECTORY,
+	PUBLIC_TICKET_DIRECTORY,
+	PUBLIC_TICKET_TEMPLATE_DIRECTORY
+} from "$env/static/public";
+import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 import { CreateTicketSchema } from "$lib/ticket/schema";
-import type { CreateTicketResponse } from "$lib/ticket/types";
+import type {
+	CreateTicketResponse,
+	GetTicketResponse
+} from "$lib/ticket/types";
+import { SeatStatus } from "$lib/map/seat/types";
+import { generateTicketPdf } from "$lib/ticket/qrcode";
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const events = await getEvents({ venue_id: params.venueId });
@@ -38,13 +48,18 @@ export const actions: Actions = {
 			});
 		}
 
-        console.log("Create:", form.data)
+		console.log("Create:", form.data);
 
 		if (
 			!form.data.reserved_by.event_id ||
 			!form.data.reserved_by.seat_id ||
 			!form.data.reserved_by.user_id
 		) {
+			if (form.data.status === SeatStatus.Reserved) {
+				return fail(400, {
+					form
+				});
+			}
 			// @ts-expect-error If `reserved_by` has invalid values, set it to
 			// `null` before sending it to the server.
 			form.data.reserved_by = null;
@@ -86,7 +101,20 @@ export const actions: Actions = {
 				"Content-Type": "application/json"
 			}
 		});
-		const result: ApiResponse<CreateTicketResponse> = await response.json();
+		const result: ApiResponse<GetTicketResponse> = await response.json();
+
+        console.log("Reserve result:", result)
+
+		if (result.status === ApiResponseStatus.Success) {
+			await generateTicketPdf(
+				PUBLIC_TICKET_TEMPLATE_DIRECTORY,
+				PUBLIC_TICKET_DIRECTORY,
+				result.data,
+                event.fetch
+			);
+
+            console.log("Successfully generated ticket PDF.")
+		}
 
 		return {
 			form,

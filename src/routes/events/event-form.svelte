@@ -76,7 +76,8 @@
 	);
 </script>
 
-<form method="POST" {action} enctype="multipart/form-data" use:enhance>
+<form method="POST" {action} enctype="multipart/form-data" use:enhance
+    class="space-y-4">
 	<Form.Field {form} name="event_id" hidden>
 		<Form.Control>
 			{#snippet children({ props })}
@@ -85,7 +86,7 @@
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Field {form} name="image">
+	<Form.Field {form} name="image" class="flex flex-col gap-1">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Image</Form.Label>
@@ -129,7 +130,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="start_at">
+	<Form.Field {form} name="start_at" class="flex flex-col gap-1">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Start At</Form.Label>
@@ -175,7 +176,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="end_at">
+	<Form.Field {form} name="end_at" class="flex flex-col gap-1">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>End At</Form.Label>
