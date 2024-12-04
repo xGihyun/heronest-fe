@@ -13,7 +13,9 @@
 	import type { ApiResponse } from "$lib/api/types";
 	import type { Event } from "$lib/map/event/types";
 	import type { Seat } from "$lib/map/seat/types";
-	import type { User } from "$lib/user/types";
+	import { UserRole, type User } from "$lib/user/types";
+	import { getUserContext } from "$lib/user/context";
+	import { _getVisibleLeafColumns } from "@tanstack/table-core";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateTicketSchema>>;
@@ -52,6 +54,12 @@
 		props.events.find((e) => e.event_id === $formData.event_id)?.name ??
 			"Select an event"
 	);
+
+	const selectedEvent = $derived(
+		props.events.find((e) => e.event_id === $formData.event_id)
+	);
+
+	const user = getUserContext();
 </script>
 
 <form method="POST" action="?/reserveSeat" class="space-y-4" use:enhance>
@@ -97,5 +105,9 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Reserve</Form.Button>
+	<Form.Button
+		disabled={user.role === UserRole.Visitor && !selectedEvent?.allow_visitors}
+	>
+		Reserve
+	</Form.Button>
 </form>

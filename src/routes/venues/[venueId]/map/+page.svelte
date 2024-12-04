@@ -23,7 +23,6 @@
 	import { v4 as uuidv4 } from "uuid";
 	import { seatFillColor, setupEventListeners } from "$lib/map/seat/utils.js";
 	import { selectedSeat } from "./state.svelte.js";
-	import { SEAT_COLOR } from "$lib/map/seat/constants.js";
 	import Sidebar from "./sidebar.svelte";
 	import SeatForm from "./seat-form.svelte";
 	import { UserRole } from "$lib/user/types.js";
@@ -69,17 +68,6 @@
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
 			seatFillColor(seat, rect, data.user);
-			//if (
-			//	seat.reserved_by &&
-			//	seat.reserved_by.user.user_id === data.user?.user_id
-			//) {
-			//	rect.fill(SEAT_COLOR.reserved_current_user);
-			//} else if (seat.reserved_by) {
-			//	rect.fill(SEAT_COLOR.reserved);
-			//} else {
-			//	rect.fill(SEAT_COLOR.available);
-			//         }
-
 			setupEventListeners(rect, seat, mapContainer, data.user);
 			seatsGroup.add(rect);
 		}

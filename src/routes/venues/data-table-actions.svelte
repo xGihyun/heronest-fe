@@ -5,6 +5,7 @@
 	import type { Venue } from "$lib/map/venue/types";
 	import { getFormState } from "./state.svelte";
 	import { FormAction } from "$lib/types";
+	import { EditIcon } from "$lib/icons";
 
 	type Props = {
 		venue: Venue;
@@ -37,6 +38,7 @@
                 formState.isOpen = true
 			}}
 		>
+            <EditIcon class="size-4" />
 			Edit
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>

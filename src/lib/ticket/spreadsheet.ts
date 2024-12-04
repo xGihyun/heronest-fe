@@ -2,8 +2,9 @@ import ExcelJS from "exceljs";
 import { DateFormatter } from "@internationalized/date";
 import type { GetTicketResponse } from "./types";
 import { formatUserName } from "$lib/user/utils";
+import type { Event } from "$lib/map/event/types";
 
-export async function generateTicketsCsv(tickets: GetTicketResponse[]) {
+export async function generateTicketsCsv(tickets: GetTicketResponse[], event?: Event) {
 	const workbook = new ExcelJS.Workbook();
 	const worksheet = workbook.addWorksheet("Events");
 
@@ -24,7 +25,8 @@ export async function generateTicketsCsv(tickets: GetTicketResponse[]) {
 	});
 
 	const df = new DateFormatter("en-US", {
-		dateStyle: "short"
+		dateStyle: "short",
+        timeStyle: "short"
 	});
 
 	tickets.forEach((ticket) => {
@@ -51,7 +53,8 @@ export async function generateTicketsCsv(tickets: GetTicketResponse[]) {
 
 	const downloadLink = document.createElement("a");
 	downloadLink.href = URL.createObjectURL(blob);
-	downloadLink.download = "reservations.csv";
+    const fileName = event ? `${event.name}-reservations.csv` :  "reservations.csv";
+	downloadLink.download = fileName;
 
 	document.body.appendChild(downloadLink);
 	downloadLink.click();

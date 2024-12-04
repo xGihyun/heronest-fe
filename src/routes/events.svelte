@@ -4,6 +4,10 @@
 	import { Label } from "$lib/components/ui/label/index.js";
 	import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
 	import { DateFormatter } from "@internationalized/date";
+	import { buttonVariants } from "$lib/components/ui/button";
+	import { ChevronRightIcon } from "$lib/icons";
+	import { getUserContext } from "$lib/user/context";
+	import { UserRole } from "$lib/user/types";
 
 	type Props = {
 		events: Event[];
@@ -16,6 +20,8 @@
 	const df = new DateFormatter("en-US", {
 		dateStyle: "medium"
 	});
+
+	const user = getUserContext();
 </script>
 
 <h1 class="mb-1 font-inter-bold text-2xl">Events</h1>
@@ -46,15 +52,38 @@
                                 transition-transform duration-500
                                 ease-in-out group-hover:scale-110"
 					/>
-					<div class="relative w-full space-y-1 bg-background px-4 py-3">
-						<h1 class="font-inter-semibold text-lg">
-							{event.name}
-						</h1>
-						<p class="text-muted-foreground">
-							{df.formatRange(new Date(event.start_at), new Date(event.end_at))}
-							•
-							{event.venue.name}
-						</p>
+					<div
+						class="relative flex w-full items-center justify-between
+                        bg-background px-4 py-3"
+					>
+						<div class="space-y-1">
+							<h1 class="font-inter-semibold text-lg">
+								{event.name}
+							</h1>
+							<p class="text-muted-foreground">
+								{df.formatRange(
+									new Date(event.start_at),
+									new Date(event.end_at)
+								)}
+								•
+								{event.venue.name}
+								{#if event.allow_visitors}
+									• Visitors Allowed
+								{/if}
+							</p>
+						</div>
+
+						{#if user.role !== UserRole.Visitor || (user.role === UserRole.Visitor && event.allow_visitors)}
+							<a
+								class={buttonVariants({
+									class: `opacity-0 transition-opacity duration-300 group-hover:opacity-100`
+								})}
+								href={`/venues/${event.venue.venue_id}/map?eventId=${event.event_id}`}
+							>
+								Reserve
+								<ChevronRightIcon class="size-6" />
+							</a>
+						{/if}
 					</div>
 				</AspectRatio>
 			</div>

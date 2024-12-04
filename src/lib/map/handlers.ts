@@ -22,11 +22,7 @@ export function handleWheel(
 		y: (pointerPosition.y - stage.y()) / oldScale
 	};
 
-	let direction = e.evt.deltaY < 0 ? 1 : -1;
-
-	if (e.evt.ctrlKey) {
-		direction = -direction;
-	}
+	const direction = e.evt.deltaY < 0 ? 1 : -1;
 
 	let newScale =
 		direction > 0 ? oldScale * SCALE_MULTIPLIER : oldScale / SCALE_MULTIPLIER;

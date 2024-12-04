@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Form from "$lib/components/ui/form/index";
 	import * as Select from "$lib/components/ui/select/index";
-	import * as Popover from "$lib/components/ui/popover/index";
 	import { Input } from "$lib/components/ui/input/index.js";
 	import {
 		type SuperValidated,
@@ -11,19 +10,10 @@
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { UserRole, UserSex } from "$lib/user/types";
 	import type { SelectOption } from "$lib/types";
-	import {
-		CalendarDate,
-		DateFormatter,
-		getLocalTimeZone,
-		today,
-		type DateValue
-	} from "@internationalized/date";
-	import { buttonVariants } from "$lib/components/ui/button";
-	import { cn } from "$lib/utils";
-	import CalendarIcon from "lucide-svelte/icons/calendar";
-	import CalendarMonthYear from "$lib/components/ui/calendar/calendar-month-year.svelte";
 	import { toast } from "svelte-sonner";
 	import { RegisterSchema } from "$lib/user/schema";
+	import { DateTimeInput } from "$lib/components/ui/date-time-input";
+	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof RegisterSchema>>;
@@ -40,7 +30,16 @@
 		},
 		onResult: (event) => {
 			if (event.result.type === "success") {
-				toast.success(event.result.data?.result.data.message, { id: toastId });
+				const result: ApiResponse = event.result.data?.result;
+
+				if (result.status !== ApiResponseStatus.Success) {
+					toast.error(result.message || "Failed to register.", { id: toastId });
+					return;
+				}
+
+				toast.success(result.message || "Successfully registered.", {
+					id: toastId
+				});
 			}
 		}
 	});
@@ -77,20 +76,6 @@
 		roleOptions.find((v) => v.value === $formData.role)?.label ??
 			"Select a role."
 	);
-
-	const df = new DateFormatter("en-US", {
-		dateStyle: "long"
-	});
-
-	let birthDate = $state<Date | undefined>();
-
-	$effect(() => {
-		birthDate = $formData.birth_date;
-	});
-
-	const timeZone = getLocalTimeZone();
-
-	let birthDatePlaceholder = $state<DateValue>(today(timeZone));
 </script>
 
 <form method="POST" class="space-y-4" use:enhance>
@@ -190,43 +175,11 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Date of birth</Form.Label>
-				<Popover.Root>
-					<Popover.Trigger
-						{...props}
-						class={cn(
-							buttonVariants({ variant: "outline" }),
-							"w-[280px] justify-start pl-4 text-left font-normal",
-							!birthDate && "text-muted-foreground"
-						)}
-					>
-						{birthDate ? df.format(birthDate) : "Pick a date"}
-						<CalendarIcon class="ml-auto size-4 opacity-50" />
-					</Popover.Trigger>
-					<Popover.Content class="w-auto p-0" side="top">
-						<CalendarMonthYear
-							type="single"
-							value={birthDate ?
-								new CalendarDate(
-									birthDate.getFullYear(),
-									birthDate.getMonth() + 1,
-									birthDate.getDate()
-								) : undefined}
-							bind:placeholder={birthDatePlaceholder}
-							minValue={new CalendarDate(1900, 1, 1)}
-							maxValue={today(timeZone)}
-							calendarLabel="Date of birth"
-							onValueChange={(v) => {
-								if (!v) {
-									$formData.birth_date = new Date();
-									return;
-								}
-								$formData.birth_date = v.toDate(timeZone);
-							}}
-						/>
-					</Popover.Content>
-				</Popover.Root>
-				<Form.FieldErrors />
-				<input hidden value={$formData.birth_date} name={props.name} />
+				<DateTimeInput
+					{...props}
+					bind:value={$formData.birth_date}
+					type="date"
+				/>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

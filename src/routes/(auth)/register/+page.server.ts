@@ -1,10 +1,10 @@
 import { fail, superValidate } from "sveltekit-superforms";
 import { valibot } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
-import { RegisterSchema } from "./schema";
 import type { Actions } from "@sveltejs/kit";
 import type { ApiResponse } from "$lib/api/types";
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
+import { RegisterSchema } from "$lib/user/schema";
 
 export const load: PageServerLoad = async () => {
   return {

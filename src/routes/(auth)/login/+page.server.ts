@@ -47,6 +47,8 @@ export const actions: Actions = {
 			secure: true
 		});
 
+        event.locals.user = result.data
+
 		redirect(302, "/");
 	}
 };

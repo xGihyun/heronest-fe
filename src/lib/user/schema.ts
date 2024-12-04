@@ -10,7 +10,10 @@ export const RegisterSchema = v.object({
 	first_name: v.pipe(v.string(), v.nonEmpty("First name is required.")),
 	middle_name: v.optional(v.string()),
 	last_name: v.pipe(v.string(), v.nonEmpty("Last name is required.")),
-	birth_date: v.optional(v.date(), () => new Date()),
+	birth_date: v.optional(
+		v.pipe(v.date(), v.toMaxValue(new Date())),
+		() => new Date()
+	),
 	sex: v.enum(UserSex)
 });
 
@@ -23,7 +26,7 @@ export const CreateUserSchema = v.object({
 	first_name: v.pipe(v.string(), v.nonEmpty("First name is required.")),
 	middle_name: v.nullable(v.string()),
 	last_name: v.pipe(v.string(), v.nonEmpty("Last name is required.")),
-	birth_date: v.optional(v.date(), () => new Date()),
+	birth_date: v.pipe(v.date(), v.toMaxValue(new Date())),
 	sex: v.enum(UserSex)
 });
 

@@ -1,5 +1,5 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse } from "$lib/api/types";
+import type { ApiResponse, PaginationResult } from "$lib/api/types";
 import type { CreateTicketInput } from "./schema";
 import type { CreateTicketResponse, GetTicketResponse } from "./types";
 
@@ -19,8 +19,33 @@ export async function createTicket(
 	return result;
 }
 
-export async function getTickets(): Promise<ApiResponse<GetTicketResponse[]>> {
-	const response = await fetch(`${PUBLIC_BACKEND_URL}/api/tickets`, {
+type GetTicketFilter = {
+	eventId?: string;
+} & PaginationResult;
+
+export async function getTickets(
+	filter?: GetTicketFilter
+): Promise<ApiResponse<GetTicketResponse[]>> {
+	const params = new URLSearchParams();
+	const endpoint = `${PUBLIC_BACKEND_URL}/api/tickets`;
+
+	if (filter) {
+		if (filter.page) {
+			params.set("page", String(filter.page));
+		}
+		if (filter.limit) {
+			params.set("limit", String(filter.limit));
+		}
+		if (filter.eventId) {
+			params.set("eventId", String(filter.eventId));
+		}
+	}
+
+	const fullEndpoint = params.toString()
+		? `${endpoint}?${params.toString()}`
+		: endpoint;
+
+	const response = await fetch(fullEndpoint, {
 		method: "GET"
 	});
 

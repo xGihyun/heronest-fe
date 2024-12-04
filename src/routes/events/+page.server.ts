@@ -36,7 +36,7 @@ export const actions: Actions = {
 			);
 		}
 
-        console.log(form.data)
+		console.log(form.data);
 
 		if (form.data.image) {
 			const imageUrl = await saveFile(
@@ -47,7 +47,6 @@ export const actions: Actions = {
 
 			form.data.image_url = imageUrl;
 		}
-
 
 		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/events`, {
 			method: "POST",
@@ -75,7 +74,7 @@ export const actions: Actions = {
 			);
 		}
 
-        console.log(form.data)
+		console.log(form.data);
 
 		if (form.data.image) {
 			const imageUrl = await saveFile(

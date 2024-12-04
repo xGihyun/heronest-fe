@@ -12,6 +12,7 @@ import EventIcon from "virtual:icons/ic/round-event";
 import MinusIcon from "virtual:icons/ic/round-minus";
 import PlusIcon from "virtual:icons/ic/round-plus";
 import SaveIcon from "virtual:icons/ic/round-save";
+import ChevronRightIcon from "virtual:icons/ic/round-chevron-right";
 
 import GeminiIcon from "virtual:icons/lineicons/gemini";
 
@@ -36,5 +37,6 @@ export {
     ClockIcon,
     SearchIcon,
     EditIcon,
-    FileDownloadIcon
+    FileDownloadIcon,
+    ChevronRightIcon
 };

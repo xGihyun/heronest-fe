@@ -10,5 +10,5 @@
 	<h1 class="font-inter-bold text-3xl mb-4">Users</h1>
 
     <Actions form={data.form} />
-	<DataTable data={data.venues} {columns} />
+	<DataTable data={data.users} {columns} />
 </div>

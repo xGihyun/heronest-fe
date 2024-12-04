@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const users = await getUsers({ page, limit, name });
 
 	return {
-		venues: users.data,
+		users: users.data,
 		form: await superValidate(valibot(CreateUserSchema))
 	};
 };

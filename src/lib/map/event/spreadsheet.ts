@@ -6,12 +6,13 @@ export async function generateEventCsv(events: Event[]) {
 	const workbook = new ExcelJS.Workbook();
 	const worksheet = workbook.addWorksheet("Events");
 
-	const headers = ["Event", "Date", "Venue"];
+	const headers = ["Event", "Date", "Venue", "Visitors Allowed"];
 
 	worksheet.addRow(headers);
 
 	const df = new DateFormatter("en-US", {
-		dateStyle: "short"
+		dateStyle: "short",
+        timeStyle: "short"
 	});
 
 	events.forEach((event) => {
@@ -19,7 +20,7 @@ export async function generateEventCsv(events: Event[]) {
 			new Date(event.start_at),
 			new Date(event.end_at)
 		);
-		const row = [event.name, eventDate, event.venue.name];
+		const row = [event.name, eventDate, event.venue.name, event.allow_visitors];
 
 		worksheet.addRow(row);
 	});

@@ -30,6 +30,10 @@ export const columns: ColumnDef<Event>[] = [
 		}
 	},
 	{
+		accessorKey: "allow_visitors",
+		header: "Visitors Allowed"
+	},
+	{
 		id: "actions",
 		cell: ({ row }) => {
 			return renderComponent(DataTableActions, { event: row.original });
