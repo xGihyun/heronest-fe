@@ -8,14 +8,12 @@ import { CreateSeatSchema } from "$lib/map/seat/schema";
 import type { Actions } from "@sveltejs/kit";
 import {
 	PUBLIC_BACKEND_URL,
-	PUBLIC_STORAGE_DIRECTORY,
 	PUBLIC_TICKET_DIRECTORY,
 	PUBLIC_TICKET_TEMPLATE_DIRECTORY
 } from "$env/static/public";
 import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 import { CreateTicketSchema } from "$lib/ticket/schema";
 import type {
-	CreateTicketResponse,
 	GetTicketResponse
 } from "$lib/ticket/types";
 import { SeatStatus } from "$lib/map/seat/types";

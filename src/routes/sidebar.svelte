@@ -5,16 +5,12 @@
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import { EventIcon, HomeIcon, LocationIcon, UsersIcon } from "$lib/icons";
-	import { UserRole, type User } from "$lib/user/types";
+	import { UserRole } from "$lib/user/types";
 	import type { Component } from "svelte";
 	import type { SVGAttributes } from "svelte/elements";
 	import ChevronUp from "lucide-svelte/icons/chevron-up";
-
-	type Props = {
-		user: User;
-	};
-
-	let props: Props = $props();
+	import { getUserContext } from "$lib/user/context";
+	import { formatUserName } from "$lib/user/utils";
 
 	type Route = {
 		name: string;
@@ -53,6 +49,8 @@
 
 		await invalidateAll();
 	}
+
+	const user = getUserContext();
 </script>
 
 <Sidebar.Root>
@@ -70,7 +68,7 @@
 				<Sidebar.Menu>
 					{@render sidebarItems(ROUTES)}
 
-					{#if props.user.role === UserRole.Admin}
+					{#if user.role === UserRole.Admin}
 						{@render sidebarItems(ADMIN_ROUTES)}
 					{/if}
 				</Sidebar.Menu>
@@ -89,19 +87,15 @@
 								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							>
 								<Avatar.Root>
-									<Avatar.Image
-										src={props.user.avatar_url}
-										alt={props.user.email}
-									/>
+									<Avatar.Image src={user.avatar_url} alt={user.email} />
 									<Avatar.Fallback class="bg-background">
-										{@const initials = `${props.user.first_name[0]}${props.user.last_name[0]}`}
+										{@const initials = `${user.first_name[0]}${user.last_name[0]}`}
 										{initials}
 									</Avatar.Fallback>
 								</Avatar.Root>
 
 								<span class="text-base">
-									{props.user.first_name}
-									{props.user.last_name}
+									{formatUserName(user)}
 								</span>
 								<ChevronUp class="ml-auto" />
 							</Sidebar.MenuButton>

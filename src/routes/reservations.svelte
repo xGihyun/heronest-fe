@@ -3,6 +3,9 @@
 	import * as Table from "$lib/components/ui/table/index.js";
 	import { FileDownloadIcon } from "$lib/icons";
 	import type { GetTicketResponse } from "$lib/ticket/types";
+	import { getUserContext } from "$lib/user/context";
+	import { UserRole } from "$lib/user/types";
+	import { formatUserName } from "$lib/user/utils";
 	import { DateFormatter } from "@internationalized/date";
 
 	type Props = {
@@ -14,6 +17,8 @@
 	const df = new DateFormatter("en-US", {
 		dateStyle: "medium"
 	});
+
+	const user = getUserContext();
 </script>
 
 <h1 class="mb-1 font-inter-bold text-2xl">Reservations</h1>
@@ -24,6 +29,9 @@
 			<Table.Row>
 				<Table.Head>Ticket No.</Table.Head>
 				<Table.Head>Reserved At</Table.Head>
+				{#if user.role === UserRole.Admin}
+					<Table.Head>User</Table.Head>
+				{/if}
 				<Table.Head>Venue</Table.Head>
 				<Table.Head>Event</Table.Head>
 			</Table.Row>
@@ -33,7 +41,7 @@
 				<Table.Row>
 					<Table.Cell>
 						<a
-							href={`/storage/tickets/${ticket.ticket_number}.pdf`}
+							href={`/storage/tickets/Ticket-${ticket.ticket_number}.pdf`}
 							target="_blank"
 							rel="noreferrer"
 							class="flex items-center
@@ -46,6 +54,11 @@
 					<Table.Cell>
 						{df.format(new Date(ticket.created_at))}
 					</Table.Cell>
+
+					{#if user.role === UserRole.Admin}
+						<Table.Cell>{formatUserName(ticket.user, "lf")}</Table.Cell>
+					{/if}
+
 					<Table.Cell>{ticket.venue.name}</Table.Cell>
 					<Table.Cell>{ticket.event.name}</Table.Cell>
 				</Table.Row>

@@ -21,7 +21,7 @@
 	import { ApiResponseStatus } from "$lib/api/types";
 	import { SeatStatus, type Seat } from "$lib/map/seat/types.js";
 	import { v4 as uuidv4 } from "uuid";
-	import { setupEventListeners } from "$lib/map/seat/utils.js";
+	import { seatFillColor, setupEventListeners } from "$lib/map/seat/utils.js";
 	import { selectedSeat } from "./state.svelte.js";
 	import { SEAT_COLOR } from "$lib/map/seat/constants.js";
 	import Sidebar from "./sidebar.svelte";
@@ -68,17 +68,17 @@
 		for (const seat of seats) {
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
-			if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
-				if (seat.reserved_by.user.user_id === data.user?.user_id) {
-					rect.fill(SEAT_COLOR.reserved_current_user);
-				} else {
-					rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
-				}
-			} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
-				rect.fill(SEAT_COLOR[SeatStatus.Available]);
-			} else {
-				rect.fill(SEAT_COLOR[seat.status]);
-			}
+			seatFillColor(seat, rect, data.user);
+			//if (
+			//	seat.reserved_by &&
+			//	seat.reserved_by.user.user_id === data.user?.user_id
+			//) {
+			//	rect.fill(SEAT_COLOR.reserved_current_user);
+			//} else if (seat.reserved_by) {
+			//	rect.fill(SEAT_COLOR.reserved);
+			//} else {
+			//	rect.fill(SEAT_COLOR.available);
+			//         }
 
 			setupEventListeners(rect, seat, mapContainer, data.user);
 			seatsGroup.add(rect);
@@ -129,13 +129,7 @@
 			</div>
 		</div>
 
-		<Select.Root
-			type="single"
-			bind:value={selectedEventId}
-			onValueChange={(value) => {
-				console.log(value);
-			}}
-		>
+		<Select.Root type="single" bind:value={selectedEventId}>
 			<Select.Trigger>
 				{#snippet child({ props: triggerProps })}
 					<button
@@ -331,22 +325,11 @@
 					{#if data.user?.role === UserRole.Admin}
 						<SeatForm
 							form={data.form}
-							seat={{
-								seat_id: selectedSeat.seat.seat_id,
-								seat_number: selectedSeat.seat.seat_number,
-								status: selectedSeat.seat.status,
-								venue_id: data.venueId,
-								metadata: selectedSeat.seat.metadata,
-								seat_section_id: selectedSeat.seat.seat_section_id || null,
-								reserved_by: {
-									seat_id: selectedSeat.seat.seat_id,
-									metadata: null,
-									user_id: selectedSeat.seat.reserved_by?.user.user_id || "",
-									event_id: selectedSeat.seat.reserved_by?.event.event_id || ""
-								}
-							}}
+							seat={selectedSeat.seat}
 							events={data.events}
 							users={data.users}
+							venueId={data.venueId}
+                            eventId={data.eventId}
 						/>
 					{:else}
 						<ReserveForm

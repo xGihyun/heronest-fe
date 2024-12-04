@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { GetTicketResponse } from "./types";
 import { formatUserName } from "$lib/user/utils";
-import { DateFormatter } from "@internationalized/date";
+import { formatDateRangeClean, formatTimeRangeClean } from "$lib/utils";
 
 export async function generateTicketPdf(
 	templatePath: string,
@@ -122,17 +122,10 @@ export async function generateTicketPdf(
 		color: rgb(1, 1, 1)
 	});
 
-	const df = new DateFormatter("en-US", {
-		dateStyle: "long"
-	});
-
-	// TODO: Fix this bug
-	//const eventDate = df.formatRange(
-	//	new Date(ticket.event.start_at),
-	//	new Date(ticket.event.end_at)
-	//);
-
-	const eventDate = df.format(new Date(ticket.event.start_at));
+	const eventDate = formatDateRangeClean(
+		new Date(ticket.event.start_at),
+		new Date(ticket.event.end_at)
+	);
 
 	page.drawText(eventDate, {
 		x: namePosition.x,
@@ -142,13 +135,10 @@ export async function generateTicketPdf(
 		color: rgb(1, 1, 1)
 	});
 
-	const timeFormatter = new DateFormatter("en-US", {
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: true
-	});
-
-	const eventTime = timeFormatter.format(new Date(ticket.event.start_at));
+	const eventTime = formatTimeRangeClean(
+		new Date(ticket.event.start_at),
+		new Date(ticket.event.end_at)
+	);
 
 	page.drawText(eventTime, {
 		x: namePosition.x,
@@ -181,7 +171,7 @@ export async function generateTicketPdf(
 		fs.mkdirSync(outputPath, { recursive: true });
 	}
 
-	const fileName = `${ticket.ticket_number}.pdf`;
+	const fileName = `Ticket-${ticket.ticket_number}.pdf`;
 	const filePath = path.join(outputPath, fileName);
 	await fs.promises.writeFile(filePath, modifiedPdfBytes);
 

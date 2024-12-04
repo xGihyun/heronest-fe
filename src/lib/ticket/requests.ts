@@ -28,3 +28,33 @@ export async function getTickets(): Promise<ApiResponse<GetTicketResponse[]>> {
 
 	return result;
 }
+
+export async function getTicketByNumber(
+	ticketNumber: string
+): Promise<ApiResponse<GetTicketResponse>> {
+	const response = await fetch(
+		`${PUBLIC_BACKEND_URL}/api/tickets/${ticketNumber}`,
+		{
+			method: "GET"
+		}
+	);
+
+	const result: ApiResponse<GetTicketResponse> = await response.json();
+
+	return result;
+}
+
+export async function getUserTickets(
+	userId: string
+): Promise<ApiResponse<GetTicketResponse[]>> {
+	const response = await fetch(
+		`${PUBLIC_BACKEND_URL}/api/users/${userId}/tickets`,
+		{
+			method: "GET"
+		}
+	);
+
+	const result: ApiResponse<GetTicketResponse[]> = await response.json();
+
+	return result;
+}

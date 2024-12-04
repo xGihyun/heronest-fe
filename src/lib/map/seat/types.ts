@@ -20,12 +20,17 @@ export type Seat = {
 export type SeatReservedBy = {
 	user: UserDetail & { user_id: string };
 	event: ReservedSeatEventDetail;
+    ticket: ReservedTicketDetail;
 };
 
 export type ReservedSeatEventDetail = {
 	event_id: string;
 	name: string;
 };
+
+export type ReservedTicketDetail = {
+    ticket_number: string;
+}
 
 //export type CreateSeatRequest = {
 //	seat_number: string;

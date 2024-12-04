@@ -69,17 +69,20 @@ export function setupEventListeners(
 			return;
 		}
 
-		if (seat.status === SeatStatus.Reserved && seat.reserved_by) {
-			if (seat.reserved_by.user.user_id === user.user_id) {
-				rect.fill(SEAT_COLOR.reserved_current_user);
-			} else {
-				rect.fill(SEAT_COLOR[SeatStatus.Reserved]);
-			}
-		} else if (seat.status === SeatStatus.Reserved && !seat.reserved_by) {
-			rect.fill(SEAT_COLOR[SeatStatus.Available]);
-		} else {
-			rect.fill(SEAT_COLOR[seat.status]);
-		}
+		seatFillColor(seat, rect, user);
 		mapContainer.style.cursor = "default";
 	});
+}
+
+export function seatFillColor(seat: Seat, rect: Rect, currentUser: User): void {
+	if (
+		seat.reserved_by &&
+		seat.reserved_by.user.user_id === currentUser.user_id
+	) {
+		rect.fill(SEAT_COLOR.reserved_current_user);
+	} else if (seat.reserved_by) {
+		rect.fill(SEAT_COLOR.reserved);
+	} else {
+		rect.fill(SEAT_COLOR.available);
+	}
 }
