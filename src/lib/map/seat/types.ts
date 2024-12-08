@@ -1,4 +1,6 @@
-import type { UserDetail } from "$lib/user/types";
+import type { UserBriefDetail } from "$lib/user/types";
+import type { EventBriefDetail } from "../event/types";
+import type { VenueBriefDetail } from "../venue/types";
 
 export enum SeatStatus {
 	Reserved = "reserved",
@@ -9,33 +11,22 @@ export enum SeatStatus {
 export type Seat = {
 	seat_id: string;
 	seat_number: string;
-	status: SeatStatus;
 	seat_section_id?: string;
 	venue_id: string;
 	metadata: object;
 
-	reserved_by?: SeatReservedBy;
+	reservation?: SeatReservation;
 };
 
-export type SeatReservedBy = {
-	user: UserDetail & { user_id: string };
-	event: ReservedSeatEventDetail;
-    ticket: ReservedTicketDetail;
+export type SeatReservation = {
+	reserved_at: string;
+	ticket_number: string;
+	//venue: VenueBriefDetail;
+	event: EventBriefDetail;
+	user: UserBriefDetail;
 };
 
-export type ReservedSeatEventDetail = {
-	event_id: string;
-	name: string;
+export type SeatBriefDetail = {
+	seat_id: string;
+	seat_number: string;
 };
-
-export type ReservedTicketDetail = {
-    ticket_number: string;
-}
-
-//export type CreateSeatRequest = {
-//	seat_number: string;
-//	status: SeatStatus;
-//	seat_section_id?: string;
-//	venue_id: string;
-//	metadata: object;
-//};

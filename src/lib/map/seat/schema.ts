@@ -4,9 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const ReservedTicketSchema = v.object({
 	user_id: v.string(),
-	seat_id: v.string(),
 	event_id: v.string(),
-	metadata: v.nullable(v.any())
 });
 
 export const CreateSeatSchema = v.object({
@@ -17,7 +15,7 @@ export const CreateSeatSchema = v.object({
 	venue_id: v.pipe(v.string(), v.nonEmpty("Venue is required.")),
 	metadata: v.any(),
 
-	reserved_by: ReservedTicketSchema
+	reservation: ReservedTicketSchema
 });
 
 export type CreateSeatInput = v.InferInput<typeof CreateSeatSchema>;
