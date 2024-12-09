@@ -19,7 +19,7 @@
 	import { handleSave } from "$lib/map/seat/handlers";
 	import { toast } from "svelte-sonner";
 	import { ApiResponseStatus } from "$lib/api/types";
-	import { SeatStatus, type Seat } from "$lib/map/seat/types.js";
+	import { type Seat } from "$lib/map/seat/types.js";
 	import { v4 as uuidv4 } from "uuid";
 	import { seatFillColor, setupEventListeners } from "$lib/map/seat/utils.js";
 	import { selectedSeat } from "./state.svelte.js";
@@ -39,7 +39,7 @@
 
 	let seats = $derived(data.seats);
 
-	let svgInput: HTMLInputElement | undefined;
+	let svgInput: HTMLInputElement | undefined = $state();
 
 	$effect(() => {
 		if (!mapContainer) {
@@ -67,8 +67,8 @@
 		for (const seat of seats) {
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
-			seatFillColor(seat, rect, data.user);
-			setupEventListeners(rect, seat, mapContainer, data.user);
+			seatFillColor(seat, rect, data.user!);
+			setupEventListeners(rect, seat, mapContainer, data.user!);
 			seatsGroup.add(rect);
 		}
 
@@ -87,11 +87,11 @@
 		const result = await handleSave(seats, data.venueId);
 
 		if (result.status !== ApiResponseStatus.Success) {
-			toast.error(result.message || "Error.", { id: toastId });
+			toast.error(result.message, { id: toastId });
 			return;
 		}
 
-		toast.success(result.message || "Success", { id: toastId });
+		toast.success(result.message, { id: toastId });
 	}
 
 	let selectedEventId = $state(data.eventId);
@@ -254,14 +254,13 @@
 
 								const seat: Seat = {
 									seat_id: uuidv4(),
-									status: SeatStatus.Unavailable,
 									venue_id: data.venueId,
 									metadata: JSON.parse(rect.toJSON()),
 									seat_number: `${i + 1}`
 								};
 
 								seats.push(seat);
-								setupEventListeners(rect, seat, mapContainer, data.user);
+								setupEventListeners(rect, seat, mapContainer, data.user!);
 							});
 						};
 						reader.readAsText(file);
@@ -324,7 +323,7 @@
 							form={data.ticketForm}
 							seat={selectedSeat.seat}
 							events={data.events}
-							user={data.user}
+							user={data.user!}
 						/>
 					{/if}
 				{/if}

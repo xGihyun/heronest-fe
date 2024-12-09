@@ -2,14 +2,14 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Table from "$lib/components/ui/table/index.js";
 	import { FileDownloadIcon } from "$lib/icons";
-	import type { GetTicketResponse } from "$lib/ticket/types";
+	import type { Ticket } from "$lib/ticket/types";
 	import { getUserContext } from "$lib/user/context";
 	import { UserRole } from "$lib/user/types";
 	import { formatUserName } from "$lib/user/utils";
 	import { DateFormatter } from "@internationalized/date";
 
 	type Props = {
-		tickets: GetTicketResponse[];
+		tickets: Ticket[];
 	};
 
 	let props: Props = $props();
@@ -52,15 +52,15 @@
 						</a>
 					</Table.Cell>
 					<Table.Cell>
-						{df.format(new Date(ticket.created_at))}
+						{df.format(new Date(ticket.reserved_at))}
 					</Table.Cell>
 
 					{#if user.role === UserRole.Admin}
-						<Table.Cell>{formatUserName(ticket.user, "lf")}</Table.Cell>
+						<Table.Cell>{formatUserName(ticket.reservation.user, "lf")}</Table.Cell>
 					{/if}
 
-					<Table.Cell>{ticket.venue.name}</Table.Cell>
-					<Table.Cell>{ticket.event.name}</Table.Cell>
+					<Table.Cell>{ticket.reservation.venue.name}</Table.Cell>
+					<Table.Cell>{ticket.reservation.event.name}</Table.Cell>
 				</Table.Row>
 			{/each}
 		</Table.Body>

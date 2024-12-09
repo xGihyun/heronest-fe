@@ -1,5 +1,5 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse, PaginationResult } from "$lib/api/types";
+import type { ApiResponse, PaginationQuery } from "$lib/api/types";
 import type { User } from "./types";
 
 export async function getUser(userId: string): Promise<ApiResponse<User>> {
@@ -14,7 +14,7 @@ export async function getUser(userId: string): Promise<ApiResponse<User>> {
 
 type GetUserFilter = {
 	name?: string;
-} & PaginationResult;
+} & PaginationQuery;
 
 export async function getUsers(
 	filter?: GetUserFilter

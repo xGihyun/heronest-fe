@@ -61,7 +61,7 @@ export function setupMap(
 	stage: Konva.Stage,
 	layer: Konva.Layer,
 	seatsGroup: Konva.Group
-) {
+): void {
 	const seatsBox = seatsGroup.getClientRect();
 
 	const mapBackground = new Konva.Rect({

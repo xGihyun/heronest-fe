@@ -10,7 +10,7 @@
 	import { ApiResponseStatus } from "$lib/api/types";
 	import type { Group } from "konva/lib/Group";
 	import { Rect } from "konva/lib/shapes/Rect";
-	import { SeatStatus, type Seat } from "$lib/map/seat/types";
+	import { type Seat } from "$lib/map/seat/types";
 	import { v4 as uuidv4 } from "uuid";
 	import { setupEventListeners } from "$lib/map/seat/utils";
 	import type { User } from "$lib/user/types";
@@ -70,7 +70,6 @@
 
 				const seat: Seat = {
 					seat_id: uuidv4(),
-					status: SeatStatus.Unavailable,
 					venue_id: props.venueId,
 					metadata: JSON.parse(rect.toJSON()),
 					seat_number: `${i + 1}`

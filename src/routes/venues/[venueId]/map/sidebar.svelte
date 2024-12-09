@@ -3,7 +3,7 @@
 	import { GeminiIcon } from "$lib/icons";
 	import type { Venue } from "$lib/map/venue/types";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
-	import { SeatStatus, type Seat } from "$lib/map/seat/types";
+	import { type Seat } from "$lib/map/seat/types";
 	import { selectedSeat } from "./state.svelte";
 
 	type Props = {
@@ -60,15 +60,17 @@
 							<GeminiIcon class="size-3" />
 							<div class="flex flex-col items-start">
 								Seat {seat.seat_number}
-								<p class="text-xs text-muted-foreground first-letter:uppercase">
-									{seat.status}
 
-									{#if seat.status === SeatStatus.Reserved && seat.reserved_by}
-										by
+								<p class="text-xs text-muted-foreground first-letter:uppercase">
+
+									{#if seat.reservation}
+										Reserved by
 										<span class="font-inter-semibold">
-											{seat.reserved_by.user.first_name}
-											{seat.reserved_by.user.last_name}
+											{seat.reservation.user.first_name}
+											{seat.reservation.user.last_name}
 										</span>
+                                    {:else}
+                                        Available
 									{/if}
 								</p>
 							</div>

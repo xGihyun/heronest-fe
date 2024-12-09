@@ -22,6 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     event.locals.user = user.data
+    event.locals.session = session
 
 	const response = await resolve(event);
 	return response;

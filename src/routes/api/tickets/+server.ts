@@ -1,5 +1,4 @@
 import type { RequestHandler } from "./$types";
-import type { ReservedTicketDetail } from "$lib/map/seat/types";
 import { getTicketByNumber } from "$lib/ticket/requests";
 import { generateTicketPdf } from "$lib/ticket/qrcode";
 import {
@@ -8,9 +7,10 @@ import {
 } from "$env/static/public";
 import { ApiResponseStatus } from "$lib/api/types";
 import { error } from "@sveltejs/kit";
+import type { SeatReservation } from "$lib/map/seat/types";
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
-	const reservedTicket: ReservedTicketDetail = await request.json();
+	const reservedTicket: SeatReservation = await request.json();
 
 	const ticket = await getTicketByNumber(reservedTicket.ticket_number);
 

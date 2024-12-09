@@ -1,11 +1,11 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse, PaginationResult } from "$lib/api/types";
+import type { ApiResponse, PaginationQuery } from "$lib/api/types";
 import type { CreateTicketInput } from "./schema";
-import type { CreateTicketResponse, GetTicketResponse } from "./types";
+import type { GetTicketFilter, Ticket } from "./types";
 
 export async function createTicket(
 	data: CreateTicketInput
-): Promise<ApiResponse<CreateTicketResponse>> {
+): Promise<ApiResponse<Ticket>> {
 	const response = await fetch(`${PUBLIC_BACKEND_URL}/api/tickets`, {
 		method: "POST",
 		body: JSON.stringify(data),
@@ -14,18 +14,14 @@ export async function createTicket(
 		}
 	});
 
-	const result: ApiResponse<CreateTicketResponse> = await response.json();
+	const result: ApiResponse<Ticket> = await response.json();
 
 	return result;
 }
 
-type GetTicketFilter = {
-	eventId?: string;
-} & PaginationResult;
-
 export async function getTickets(
 	filter?: GetTicketFilter
-): Promise<ApiResponse<GetTicketResponse[]>> {
+): Promise<ApiResponse<Ticket[]>> {
 	const params = new URLSearchParams();
 	const endpoint = `${PUBLIC_BACKEND_URL}/api/tickets`;
 
@@ -39,6 +35,9 @@ export async function getTickets(
 		if (filter.eventId) {
 			params.set("eventId", String(filter.eventId));
 		}
+		if (filter.userId) {
+			params.set("eventId", String(filter.eventId));
+		}
 	}
 
 	const fullEndpoint = params.toString()
@@ -49,14 +48,14 @@ export async function getTickets(
 		method: "GET"
 	});
 
-	const result: ApiResponse<GetTicketResponse[]> = await response.json();
+	const result: ApiResponse<Ticket[]> = await response.json();
 
 	return result;
 }
 
 export async function getTicketByNumber(
 	ticketNumber: string
-): Promise<ApiResponse<GetTicketResponse>> {
+): Promise<ApiResponse<Ticket>> {
 	const response = await fetch(
 		`${PUBLIC_BACKEND_URL}/api/tickets/${ticketNumber}`,
 		{
@@ -64,22 +63,7 @@ export async function getTicketByNumber(
 		}
 	);
 
-	const result: ApiResponse<GetTicketResponse> = await response.json();
-
-	return result;
-}
-
-export async function getUserTickets(
-	userId: string
-): Promise<ApiResponse<GetTicketResponse[]>> {
-	const response = await fetch(
-		`${PUBLIC_BACKEND_URL}/api/users/${userId}/tickets`,
-		{
-			method: "GET"
-		}
-	);
-
-	const result: ApiResponse<GetTicketResponse[]> = await response.json();
+	const result: ApiResponse<Ticket> = await response.json();
 
 	return result;
 }

@@ -12,7 +12,6 @@
 	import type { CreateEventSchema } from "$lib/map/event/schema";
 	import type { Venue } from "$lib/map/venue/types";
 	import { generateEventCsv } from "$lib/map/event/spreadsheet";
-	import type { Event } from "$lib/map/event/types";
 	import { getEvents } from "$lib/map/event/requests";
 
 	type Props = {
@@ -22,12 +21,12 @@
 	let props: Props = $props();
 
 	const formState = getFormState();
-	let searchValue = $state("");
+	let nameSearchValue = $state("");
 
 	async function search() {
 		const params = $page.url.searchParams;
 
-		params.set("name", searchValue);
+		params.set("name", nameSearchValue);
 
 		await goto(`?${params.toString()}`);
 		await invalidateAll();
@@ -54,7 +53,7 @@
 				class="peer w-full ps-9"
 				type="search"
 				placeholder="Enter a venue..."
-				bind:value={searchValue}
+				bind:value={nameSearchValue}
 				onkeypress={(e) => {
 					if (e.key === "Enter") {
 						search();

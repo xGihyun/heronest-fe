@@ -2,6 +2,7 @@ import type { CreateVenueInput } from "./schema";
 
 export type Venue = {
 	venue_id: string;
+    capacity: string;
 } & CreateVenueInput;
 
 export type VenueBriefDetail = {

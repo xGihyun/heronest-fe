@@ -37,7 +37,7 @@
                 return
 			}
 
-			console.debug("Unexpected result type: " + event.result.type);
+			console.debug("Unexpected result: " + event.result);
 		},
         resetForm: false
 	});

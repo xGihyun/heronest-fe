@@ -13,18 +13,15 @@ import {
 } from "$env/static/public";
 import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 import { CreateTicketSchema } from "$lib/ticket/schema";
-import type {
-	GetTicketResponse
-} from "$lib/ticket/types";
-import { SeatStatus } from "$lib/map/seat/types";
 import { generateTicketPdf } from "$lib/ticket/qrcode";
+import type { Ticket } from "$lib/ticket/types";
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const events = await getEvents({ venue_id: params.venueId });
 
-	const eventId = url.searchParams.get("eventId") || events.data[0].event_id;
+	const eventId = url.searchParams.get("eventId");
 
-	const seats = await getSeats(params.venueId, eventId);
+	const seats = await getSeats(params.venueId, eventId || undefined);
 	const users = await getUsers();
 
 	return {
@@ -46,21 +43,22 @@ export const actions: Actions = {
 			});
 		}
 
-		console.log("Create:", form.data);
+		console.debug("Create seat:", form.data);
 
+        // NOTE: This is pretty bad
 		if (
-			!form.data.reserved_by.event_id ||
-			!form.data.reserved_by.seat_id ||
-			!form.data.reserved_by.user_id
+			!form.data.reservation.event_id ||
+			!form.data.reservation.user_id
 		) {
-			if (form.data.status === SeatStatus.Reserved) {
+			if (form.data.reservation) {
 				return fail(400, {
 					form
 				});
 			}
-			// @ts-expect-error If `reserved_by` has invalid values, set it to
+
+			// @ts-expect-error If `reservation` has invalid values, set it to
 			// `null` before sending it to the server.
-			form.data.reserved_by = null;
+			form.data.reservation = null;
 		}
 
 		const response = await fetch(
@@ -75,7 +73,7 @@ export const actions: Actions = {
 		);
 		const result: ApiResponse = await response.json();
 
-		console.log(result);
+		console.debug("Created seat:", result);
 
 		return {
 			form,
@@ -90,7 +88,7 @@ export const actions: Actions = {
 			});
 		}
 
-		console.log("Reserve:", form.data);
+		console.debug("Reserve seat:", form.data);
 
 		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/tickets`, {
 			method: "POST",
@@ -99,9 +97,9 @@ export const actions: Actions = {
 				"Content-Type": "application/json"
 			}
 		});
-		const result: ApiResponse<GetTicketResponse> = await response.json();
+		const result: ApiResponse<Ticket> = await response.json();
 
-        console.log("Reserve result:", result)
+        console.debug("Reserved seat:", result)
 
 		if (result.status === ApiResponseStatus.Success) {
 			await generateTicketPdf(
@@ -111,7 +109,7 @@ export const actions: Actions = {
                 event.fetch
 			);
 
-            console.log("Successfully generated ticket PDF.")
+            console.debug("Successfully generated ticket PDF.")
 		}
 
 		return {

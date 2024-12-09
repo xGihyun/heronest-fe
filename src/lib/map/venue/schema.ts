@@ -4,7 +4,6 @@ export const CreateVenueSchema = v.object({
     venue_id: v.optional(v.string()),
 	name: v.pipe(v.string(), v.nonEmpty()),
 	description: v.optional(v.string()),
-	capacity: v.number(),
 	location: v.pipe(v.string(), v.nonEmpty()),
 	image_url: v.nullable(v.string())
 });

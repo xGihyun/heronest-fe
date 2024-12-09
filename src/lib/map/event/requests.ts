@@ -1,11 +1,11 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse, PaginationResult } from "$lib/api/types";
+import type { ApiResponse, PaginationQuery } from "$lib/api/types";
 import type { Event } from "./types";
 
 type GetEventFilter = {
 	venue_id?: string;
     name?: string;
-} & PaginationResult;
+} & PaginationQuery;
 
 export async function getEvents(
 	filter?: GetEventFilter

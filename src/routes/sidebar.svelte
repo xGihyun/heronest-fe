@@ -10,7 +10,7 @@
 	import type { SVGAttributes } from "svelte/elements";
 	import ChevronUp from "lucide-svelte/icons/chevron-up";
 	import { getUserContext } from "$lib/user/context";
-	import { formatUserName } from "$lib/user/utils";
+	import { formatUserName, getUserInitials } from "$lib/user/utils";
 
 	type Route = {
 		name: string;
@@ -89,7 +89,7 @@
 								<Avatar.Root>
 									<Avatar.Image src={user.avatar_url} alt={user.email} />
 									<Avatar.Fallback class="bg-background">
-										{@const initials = `${user.first_name[0]}${user.last_name[0]}`}
+										{@const initials = getUserInitials(user)}
 										{initials}
 									</Avatar.Fallback>
 								</Avatar.Root>

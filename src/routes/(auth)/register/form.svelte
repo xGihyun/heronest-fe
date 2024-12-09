@@ -29,18 +29,22 @@
 			toastId = toast.loading("Submitting...");
 		},
 		onResult: (event) => {
-			if (event.result.type === "success") {
-				const result: ApiResponse = event.result.data?.result;
-
-				if (result.status !== ApiResponseStatus.Success) {
-					toast.error(result.message || "Failed to register.", { id: toastId });
-					return;
-				}
-
-				toast.success(result.message || "Successfully registered.", {
-					id: toastId
-				});
+			if (event.result.type !== "success") {
+				console.error("Unexpected result after registration:", event.result);
+				toast.error("Unexpected result after registration.", { id: toastId });
+				return;
 			}
+
+			const result: ApiResponse = event.result.data?.result;
+
+			if (result.status !== ApiResponseStatus.Success) {
+				toast.error(result.message, { id: toastId });
+				return;
+			}
+
+			toast.success(result.message, {
+				id: toastId
+			});
 		}
 	});
 

@@ -83,16 +83,6 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="capacity">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Capacity</Form.Label>
-				<Input {...props} bind:value={$formData.capacity} type="number" />
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
     <!-- TODO: Add this! -->
 	<Form.Field {form} name="image_url" hidden>
 		<Form.Control>

@@ -3,6 +3,7 @@
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import * as Table from "$lib/components/ui/table/index.js";
 	import { DateFormatter } from "@internationalized/date";
+	import { formatUserName, getUserInitials } from "$lib/user/utils.js";
 
 	let { data } = $props();
 
@@ -17,12 +18,11 @@
 			<Avatar.Root class="size-28">
 				<Avatar.Image src={data.user?.avatar_url} alt={data.user?.email} />
 				<Avatar.Fallback class="bg-foreground text-background text-4xl">
-					{@const initials = `${data.user?.first_name[0]}${data.user?.last_name[0]}`}
-					{initials}
+					{getUserInitials(data.user!)}
 				</Avatar.Fallback>
 			</Avatar.Root>
 
-			<Card.Title class="text-xl">{data.user?.first_name} {data.user?.last_name}</Card.Title>
+			<Card.Title class="text-xl">{formatUserName(data.user!)}</Card.Title>
 		</Card.Header>
 
 		<Card.Content>
@@ -42,7 +42,7 @@
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell class="font-inter-semibold w-40">Birthday</Table.Cell>
-						<Table.Cell>{df.format(new Date(data.user?.birth_date))}</Table.Cell>
+						<Table.Cell>{df.format(new Date(data.user!.birth_date))}</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>

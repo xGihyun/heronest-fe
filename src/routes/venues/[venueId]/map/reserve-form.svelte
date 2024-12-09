@@ -15,7 +15,6 @@
 	import type { Seat } from "$lib/map/seat/types";
 	import { UserRole, type User } from "$lib/user/types";
 	import { getUserContext } from "$lib/user/context";
-	import { _getVisibleLeafColumns } from "@tanstack/table-core";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateTicketSchema>>;

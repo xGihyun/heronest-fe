@@ -1,10 +1,10 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
-import type { ApiResponse, PaginationResult } from "$lib/api/types";
+import type { ApiResponse, PaginationQuery } from "$lib/api/types";
 import type { Venue } from "./types";
 
 type GetVenueFilter = {
 	name?: string;
-} & PaginationResult;
+} & PaginationQuery;
 
 export async function getVenues(
 	filter?: GetVenueFilter
