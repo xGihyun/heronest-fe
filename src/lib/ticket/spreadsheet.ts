@@ -3,6 +3,8 @@ import { DateFormatter } from "@internationalized/date";
 import { formatUserName } from "$lib/user/utils";
 import type { Event } from "$lib/map/event/types";
 import type { Ticket } from "./types";
+import { downloadFile } from "$lib/utils";
+import { format } from "date-fns";
 
 export async function generateTicketsCsv(tickets: Ticket[], event?: Event) {
 	const workbook = new ExcelJS.Workbook();
@@ -26,7 +28,7 @@ export async function generateTicketsCsv(tickets: Ticket[], event?: Event) {
 
 	const df = new DateFormatter("en-US", {
 		dateStyle: "short",
-        timeStyle: "short"
+		timeStyle: "short"
 	});
 
 	tickets.forEach((ticket) => {
@@ -51,12 +53,10 @@ export async function generateTicketsCsv(tickets: Ticket[], event?: Event) {
 	const csvBuffer = await workbook.csv.writeBuffer();
 	const blob = new Blob([csvBuffer], { type: "text/csv" });
 
-	const downloadLink = document.createElement("a");
-	downloadLink.href = URL.createObjectURL(blob);
-    const fileName = event ? `${event.name}-reservations.csv` :  "reservations.csv";
-	downloadLink.download = fileName;
+	const currentDate = format(new Date(), "yyyy-MM-dd - hh:mma");
+	const fileName = event
+		? `${event.name} - Reservations - ${currentDate}.csv`
+		: `Reservations - ${currentDate}.csv`;
 
-	document.body.appendChild(downloadLink);
-	downloadLink.click();
-	document.body.removeChild(downloadLink);
+	downloadFile(blob, fileName);
 }

@@ -1,5 +1,7 @@
 import ExcelJS from "exceljs";
 import type { Venue } from "./types";
+import { downloadFile } from "$lib/utils";
+import { format } from "date-fns";
 
 export async function generateVenuesCsv(venues: Venue[]) {
 	const workbook = new ExcelJS.Workbook();
@@ -17,12 +19,8 @@ export async function generateVenuesCsv(venues: Venue[]) {
 
 	const csvBuffer = await workbook.csv.writeBuffer();
 	const blob = new Blob([csvBuffer], { type: "text/csv" });
+    const currentDate = format(new Date(), "yyyy-MM-dd - hh:mma")
+    const fileName = `Venues - ${currentDate}.csv`
 
-	const downloadLink = document.createElement("a");
-	downloadLink.href = URL.createObjectURL(blob);
-	downloadLink.download = "venues.csv";
-
-	document.body.appendChild(downloadLink);
-	downloadLink.click();
-	document.body.removeChild(downloadLink);
+    downloadFile(blob, fileName)
 }

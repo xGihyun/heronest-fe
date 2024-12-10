@@ -3,35 +3,45 @@ import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./data-table-actions.svelte";
 import type { Event } from "$lib/map/event/types";
 import { DateFormatter } from "@internationalized/date";
+import MapLink from "./map-link.svelte";
 
 const df = new DateFormatter("en-US", {
-	dateStyle: "medium"
+	dateStyle: "medium",
+	timeStyle: "short"
 });
 
 export const columns: ColumnDef<Event>[] = [
 	{
 		accessorKey: "name",
-		header: "Name"
+		header: "Name",
+		cell: ({ row }) => {
+			return renderComponent(MapLink, { event: row.original });
+		}
 	},
 	{
 		accessorKey: "venue.name",
 		header: "Venue"
 	},
 	{
-		header: "Start",
+		header: "Date",
 		accessorFn: (event) => {
-			return df.format(new Date(event.start_at));
-		}
-	},
-	{
-		header: "End",
-		accessorFn: (event) => {
-			return df.format(new Date(event.end_at));
+			const eventDate = df.formatRange(
+				new Date(event.start_at),
+				new Date(event.end_at)
+			);
+			return eventDate;
 		}
 	},
 	{
 		accessorKey: "allow_visitors",
-		header: "Visitors Allowed"
+		header: "Visitors Allowed",
+		accessorFn: (event) => {
+			if (event.allow_visitors) {
+				return "Yes";
+			}
+
+			return "No";
+		}
 	},
 	{
 		id: "actions",

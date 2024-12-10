@@ -5,7 +5,8 @@
 	import {
 		type SuperValidated,
 		type Infer,
-		superForm
+		superForm,
+		setError
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { UserRole, UserSex } from "$lib/user/types";
@@ -20,22 +21,37 @@
 	};
 
 	let props: Props = $props();
-
 	let toastId: number | string;
 
 	const form = superForm(props.form, {
 		validators: valibotClient(RegisterSchema),
-		onSubmit: () => {
-			toastId = toast.loading("Submitting...");
+		onSubmit() {
+			toastId = toast.loading("Registering...");
 		},
-		onResult: (event) => {
+		onResult(event) {
 			if (event.result.type !== "success") {
 				console.error("Unexpected result after registration:", event.result);
 				toast.error("Unexpected result after registration.", { id: toastId });
 				return;
 			}
+		},
+		onUpdate(event) {
+			const isStudentEmail = event.form.data.email.endsWith("@umak.edu.ph");
+			if (!isStudentEmail && event.form.data.role === UserRole.Student) {
+				setError(event.form, "email", "Only students with UMak emails are accepted.");
+			}
 
-			const result: ApiResponse = event.result.data?.result;
+            if(event.form.data.birth_date > new Date()) {
+				setError(event.form, "birth_date", "The maximum birth date is the current date.");
+            }
+		},
+		onUpdated(event) {
+			if (!event.form.valid) {
+				toast.error("Invalid form data.", { id: toastId });
+				return;
+			}
+
+			const result: ApiResponse = event.form.message;
 
 			if (result.status !== ApiResponseStatus.Success) {
 				toast.error(result.message, { id: toastId });
@@ -189,5 +205,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<Form.Button class="w-full">Register</Form.Button>
 </form>

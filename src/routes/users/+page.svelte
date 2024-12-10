@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Actions from "./actions.svelte";
 	import { columns } from "./columns";
-	import DataTable from "./data-table.svelte";
+    import {DataTable} from "$lib/components/ui/data-table"
 
 	let { data } = $props();
 </script>

@@ -11,7 +11,7 @@ export function formatUserName(
 	return `${user.first_name} ${user.last_name}`;
 }
 
-export function getUserInitials(user: User): string {
+export function getUserInitials(user: User | UserBriefDetail): string {
 	const initials = `${user.first_name[0]}${user.last_name[0]}`;
 
 	return initials;

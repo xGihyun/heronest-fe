@@ -1,6 +1,8 @@
 import ExcelJS from "exceljs";
 import type { Event } from "./types";
 import { DateFormatter } from "@internationalized/date";
+import { downloadFile } from "$lib/utils";
+import { format } from "date-fns";
 
 export async function generateEventCsv(events: Event[]) {
 	const workbook = new ExcelJS.Workbook();
@@ -12,7 +14,7 @@ export async function generateEventCsv(events: Event[]) {
 
 	const df = new DateFormatter("en-US", {
 		dateStyle: "short",
-        timeStyle: "short"
+		timeStyle: "short"
 	});
 
 	events.forEach((event) => {
@@ -25,14 +27,10 @@ export async function generateEventCsv(events: Event[]) {
 		worksheet.addRow(row);
 	});
 
-    const csvBuffer = await workbook.csv.writeBuffer()
-    const blob = new Blob([csvBuffer], {type: 'text/csv'})
+	const csvBuffer = await workbook.csv.writeBuffer();
+	const blob = new Blob([csvBuffer], { type: "text/csv" });
+	const currentDate = format(new Date(), "yyyy-MM-dd - hh:mma");
+	const fileName = `Events - ${currentDate}.csv`;
 
-    const downloadLink= document.createElement('a')
-    downloadLink.href = URL.createObjectURL(blob)
-    downloadLink.download = "events.csv"
-
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
+	downloadFile(blob, fileName);
 }

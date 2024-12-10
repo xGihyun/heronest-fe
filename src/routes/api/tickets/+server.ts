@@ -1,11 +1,9 @@
 import type { RequestHandler } from "./$types";
 import { getTicketByNumber } from "$lib/ticket/requests";
-import { generateTicketPdf } from "$lib/ticket/qrcode";
 import {
-	PUBLIC_TICKET_DIRECTORY,
-	PUBLIC_TICKET_TEMPLATE_DIRECTORY
+    PUBLIC_BACKEND_URL,
 } from "$env/static/public";
-import { ApiResponseStatus } from "$lib/api/types";
+import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 import { error } from "@sveltejs/kit";
 import type { SeatReservation } from "$lib/map/seat/types";
 
@@ -18,14 +16,17 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 		throw error(ticket.status_code, ticket.message);
 	}
 
-	await generateTicketPdf(
-		PUBLIC_TICKET_TEMPLATE_DIRECTORY,
-		PUBLIC_TICKET_DIRECTORY,
-		ticket.data,
-		fetch
-	);
+    const response = await fetch(`${PUBLIC_BACKEND_URL}/api/tickets/${ticket.data.ticket_number}/pdf`,{
+        method: "POST",
+        body: JSON.stringify(ticket.data),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
 
-	console.log("Successfully generated ticket PDF.");
+    const result: ApiResponse = await response.json()
+
+	console.log(result.message);
 
 	return new Response();
 };

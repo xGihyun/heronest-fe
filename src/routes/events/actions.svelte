@@ -52,7 +52,7 @@
 			<Input
 				class="peer w-full ps-9"
 				type="search"
-				placeholder="Enter a venue..."
+				placeholder="Enter an event..."
 				bind:value={nameSearchValue}
 				onkeypress={(e) => {
 					if (e.key === "Enter") {
@@ -69,7 +69,7 @@
 		</div>
 
 		<div>
-			<Button onclick={downloadEvents} variant="outline">
+			<Button onclick={downloadEvents} variant="secondary">
 				<FileDownloadIcon class="size-4" />
 				Report
 			</Button>

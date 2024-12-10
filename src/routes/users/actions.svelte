@@ -10,7 +10,6 @@
 	import { getFormState } from "./state.svelte";
 	import type { Infer, SuperValidated } from "sveltekit-superforms";
 	import type { CreateUserSchema } from "$lib/user/schema";
-	import type { User } from "$lib/user/types";
 	import { getUsers } from "$lib/user/requests";
 	import { generateUsersCsv } from "$lib/user/spreadsheet";
 
@@ -69,7 +68,7 @@
 		</div>
 
 		<div>
-			<Button onclick={downloadUsers} variant="outline">
+			<Button onclick={downloadUsers} variant="secondary">
 				<FileDownloadIcon class="size-4" />
 				Report
 			</Button>

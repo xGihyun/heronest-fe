@@ -20,8 +20,6 @@
 	async function getReservationReportByEvent(event: Event) {
 		const tickets = await getTickets({ eventId: event.event_id });
 
-        console.log(tickets)
-
 		await generateTicketsCsv(tickets.data, event);
 	}
 </script>

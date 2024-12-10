@@ -14,7 +14,7 @@
 	import type { Event } from "$lib/map/event/types";
 	import type { Seat } from "$lib/map/seat/types";
 	import { UserRole, type User } from "$lib/user/types";
-	import { getUserContext } from "$lib/user/context";
+	import { getAuthContext } from "$lib/user/auth/context.svelte";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateTicketSchema>>;
@@ -58,7 +58,7 @@
 		props.events.find((e) => e.event_id === $formData.event_id)
 	);
 
-	const user = getUserContext();
+	const authContext = getAuthContext();
 </script>
 
 <form method="POST" action="?/reserveSeat" class="space-y-4" use:enhance>
@@ -105,7 +105,7 @@
 	</Form.Field>
 
 	<Form.Button
-		disabled={user.role === UserRole.Visitor && !selectedEvent?.allow_visitors}
+		disabled={authContext.user.role === UserRole.Visitor && !selectedEvent?.allow_visitors}
 	>
 		Reserve
 	</Form.Button>

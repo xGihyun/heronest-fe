@@ -67,7 +67,7 @@
 		</div>
 
 		<div>
-			<Button onclick={downloadVenues} variant="outline">
+			<Button onclick={downloadVenues} variant="secondary">
 				<FileDownloadIcon class="size-4" />
 				Report
 			</Button>

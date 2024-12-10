@@ -1,4 +1,4 @@
-import { fail, superValidate } from "sveltekit-superforms";
+import { fail, message, superValidate } from "sveltekit-superforms";
 import { valibot } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
 import type { Actions } from "@sveltejs/kit";
@@ -31,11 +31,8 @@ export const actions: Actions = {
 
 		const result: ApiResponse = await response.json();
 
-        console.debug("Register:", result)
+		console.debug("Register:", result);
 
-		return {
-			form,
-			result
-		};
+		return message(form, result);
 	}
 };

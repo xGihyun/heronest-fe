@@ -64,3 +64,13 @@ export function formatTimeRangeClean(
 		.replace(/\u2009/g, " ")
 		.replace(/\u202f/g, " ");
 }
+
+export function downloadFile(blob: Blob, fileName: string) {
+	const downloadLink = document.createElement("a");
+	downloadLink.href = URL.createObjectURL(blob);
+	downloadLink.download = fileName;
+
+	document.body.appendChild(downloadLink);
+	downloadLink.click();
+	document.body.removeChild(downloadLink);
+}
