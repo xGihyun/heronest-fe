@@ -15,6 +15,7 @@
 	import { RegisterSchema } from "$lib/user/schema";
 	import { DateTimeInput } from "$lib/components/ui/date-time-input";
 	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
+	import { goto } from "$app/navigation";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof RegisterSchema>>;
@@ -38,14 +39,22 @@
 		onUpdate(event) {
 			const isStudentEmail = event.form.data.email.endsWith("@umak.edu.ph");
 			if (!isStudentEmail && event.form.data.role === UserRole.Student) {
-				setError(event.form, "email", "Only students with UMak emails are accepted.");
+				setError(
+					event.form,
+					"email",
+					"Only students with UMak emails are accepted."
+				);
 			}
 
-            if(event.form.data.birth_date > new Date()) {
-				setError(event.form, "birth_date", "The maximum birth date is the current date.");
-            }
+			if (event.form.data.birth_date > new Date()) {
+				setError(
+					event.form,
+					"birth_date",
+					"The maximum birth date is the current date."
+				);
+			}
 		},
-		onUpdated(event) {
+		async onUpdated(event) {
 			if (!event.form.valid) {
 				toast.error("Invalid form data.", { id: toastId });
 				return;
@@ -61,7 +70,10 @@
 			toast.success(result.message, {
 				id: toastId
 			});
-		}
+
+			await goto("/login");
+		},
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;

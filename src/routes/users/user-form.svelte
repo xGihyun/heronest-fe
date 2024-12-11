@@ -239,5 +239,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<Form.Button class="w-full">Submit</Form.Button>
 </form>
