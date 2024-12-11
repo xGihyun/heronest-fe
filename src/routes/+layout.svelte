@@ -36,7 +36,7 @@
 	</Sidebar.Provider>
 {:else}
 	<main class="h-svh">
-		<div class="h-full w-full px-5 py-5">
+		<div class="h-full w-full">
 			{@render children()}
 		</div>
 	</main>

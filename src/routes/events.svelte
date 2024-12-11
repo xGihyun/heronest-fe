@@ -4,7 +4,6 @@
 	import { Label } from "$lib/components/ui/label/index.js";
 	import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
 	import { DateFormatter } from "@internationalized/date";
-	import { buttonVariants } from "$lib/components/ui/button";
 	import { ChevronRightIcon } from "$lib/icons";
 	import { UserRole, type User } from "$lib/user/types";
 	import { Progress } from "$lib/components/ui/progress/index.js";
@@ -23,7 +22,7 @@
 	});
 </script>
 
-<h1 class="mb-1 font-inter-bold text-2xl">Events</h1>
+<h1 class="mb-2 font-inter-bold text-3xl">Events</h1>
 
 <RadioGroup.Root
 	class="grid grid-cols-2 gap-4 xl:grid-cols-3"
@@ -42,9 +41,9 @@
 			<div class="group overflow-hidden rounded-xl border shadow">
 				<AspectRatio
 					ratio={16 / 12}
-					class="flex flex-col w-full items-end overflow-hidden"
+					class="flex w-full flex-col items-end overflow-hidden"
 				>
-					<div class="relative w-full h-full">
+					<div class="relative h-full w-full">
 						<img
 							src={event.image_url
 								? `/storage/images/events/${event.image_url}`
@@ -60,7 +59,9 @@
 								class="absolute left-0 top-0 h-full w-full content-center bg-primary/0 text-background duration-500 group-hover:bg-primary/75"
 								href={`/venues/${event.venue.venue_id}/map?eventId=${event.event_id}`}
 							>
-								<span class="flex items-center font-inter-semibold text-lg opacity-0 group-hover:opacity-100 duration-500 justify-center">
+								<span
+									class="flex items-center justify-center font-inter-semibold text-lg opacity-0 duration-500 group-hover:opacity-100"
+								>
 									Reserve
 									<ChevronRightIcon class="size-8" />
 								</span>
@@ -68,9 +69,7 @@
 						{/if}
 					</div>
 
-					<div
-						class="relative flex w-full flex-col gap-4 bg-card px-4 py-3"
-					>
+					<div class="relative flex w-full flex-col gap-4 bg-card px-4 py-3">
 						<div class="flex">
 							<div>
 								<h1 class="line-clamp-1 font-inter-semibold text-base">
@@ -97,9 +96,11 @@
 								class="h-1 w-full"
 							/>
 
-							<p class="text-sm text-primary">
-								Reservations ({event.total_reservation} / {event.venue
-									.capacity})
+							<p class="flex justify-between text-sm text-primary">
+								Reservations
+								<span>
+									({event.total_reservation} / {event.venue.capacity})
+								</span>
 							</p>
 						</div>
 					</div>

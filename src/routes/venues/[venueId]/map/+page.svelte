@@ -27,6 +27,7 @@
 	import SeatForm from "./seat-form.svelte";
 	import { UserRole } from "$lib/user/types.js";
 	import ReserveForm from "./reserve-form.svelte";
+	import { Progress } from "$lib/components/ui/progress/index.js";
 
 	let { data } = $props();
 
@@ -96,6 +97,10 @@
 
 	let selectedEventId = $state(data.eventId);
 
+	const selectedEvent = $derived(
+		data.events.find((e) => e.event_id === selectedEventId)
+	);
+
 	const eventTriggerContent = $derived(
 		data.events.find((e) => e.event_id === selectedEventId)?.name ??
 			"Select an event"
@@ -105,16 +110,18 @@
 <div class="flex h-full w-full overflow-clip">
 	<div class="relative h-full flex-1">
 		<div
-			class="absolute left-0 top-0 z-[11] flex h-20
-            w-full items-center gap-2 bg-neutral-200 text-foreground shadow-map-bottom"
+			class="absolute left-0 top-0 z-[11] flex h-20 w-full items-center gap-60 bg-background text-foreground shadow-map-bottom"
 		>
-			<LocationIcon class="size-12" />
-			<div>
-				<p class="font-inter-semibold">Venue</p>
-				<p class="font-inter-semibold text-lg text-foreground/60">
-					{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
-				</p>
+			<div class="flex gap-2">
+				<LocationIcon class="size-12" />
+				<div>
+					<p class="font-inter-semibold">Venue</p>
+					<p class="font-inter-semibold text-lg text-foreground/60">
+						{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
+					</p>
+				</div>
 			</div>
+
 		</div>
 
 		<Select.Root type="single" bind:value={selectedEventId}>
@@ -122,8 +129,7 @@
 				{#snippet child({ props: triggerProps })}
 					<button
 						{...triggerProps}
-						class="absolute left-2 top-32 z-[11] flex w-full max-w-72 items-center justify-between gap-2
-                        rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
+						class="absolute left-2 top-32 z-[11] flex w-full max-w-72 items-center justify-between gap-2 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
 					>
 						<div class="flex items-center gap-2">
 							<EventIcon class="size-6 text-accent" />
@@ -160,21 +166,49 @@
 
 		<div
 			bind:this={mapContainer}
-			class="relative z-10 h-full w-full bg-neutral-200"
+			class="relative z-10 h-full w-full bg-map"
 		></div>
 
+			{#if selectedEvent}
+				<div class="w-80 space-y-1 absolute right-12 top-32 z-[11] bg-background rounded-full px-3 py-2 shadow">
+					<Progress
+						value={selectedEvent.total_reservation}
+						max={selectedEvent.venue.capacity}
+						class="h-1 w-full"
+					/>
+
+					<p class="flex justify-between text-sm text-primary">
+						Reservations
+						<span>
+							({selectedEvent.total_reservation} / {selectedEvent.venue
+								.capacity})
+						</span>
+					</p>
+				</div>
+			{/if}
+
 		<div
-			class="absolute bottom-0 left-0 z-[11] h-20 w-full bg-neutral-200
-            text-foreground shadow-map-top"
+			class="absolute bottom-0 left-0 z-[11] h-20 w-full bg-background text-foreground shadow-map-top"
 		>
+			<div class="absolute bottom-0 left-10 z-10 flex flex-col gap-2">
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-[#f8bd3f]"></span>
+					<p class="text-sm">Your Reservation</p>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-accent"></span>
+					<p class="text-sm">Reserved</p>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-[#888888]"></span>
+					<p class="text-sm">Available</p>
+				</div>
+			</div>
+
 			<div
-				class="absolute bottom-10 left-1/2
-                z-10 flex w-full max-w-96 -translate-x-1/2
-                cursor-pointer
-                items-center gap-2 space-x-4 rounded-full border-2
-                border-neutral-400/85 bg-neutral-900/85 px-3
-                py-2 text-background
-                shadow"
+				class="absolute bottom-10 left-1/2 z-10 flex w-full max-w-96 -translate-x-1/2 cursor-pointer items-center gap-2 space-x-4 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
 			>
 				<Button
 					class="h-auto rounded-full p-1"
@@ -316,7 +350,7 @@
 							events={data.events}
 							users={data.users}
 							venueId={data.venueId}
-                            eventId={data.eventId}
+							eventId={data.eventId}
 						/>
 					{:else}
 						<ReserveForm

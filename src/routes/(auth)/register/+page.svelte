@@ -2,12 +2,18 @@
 	import * as Card from "$lib/components/ui/card/index";
 	import type { PageData } from "./$types";
 	import RegisterForm from "./form.svelte";
+	import { umakBg } from "$lib/assets/images";
+	import { WingIcon } from "$lib/icons";
 
 	export let data: PageData;
 </script>
 
 <div class="grid h-full grid-cols-2">
-	<section class="content-center">
+	<section class="content-center space-y-4 p-5 overflow-auto">
+		<div class="flex flex-col items-center gap-2">
+			<WingIcon class="size-16 text-accent" />
+			<h1 class="text-center font-inter-bold text-3xl">Welcome to Heronest</h1>
+		</div>
 		<div class="mx-auto w-full max-w-lg">
 			<Card.Root>
 				<Card.Header>
@@ -31,5 +37,7 @@
 		</div>
 	</section>
 
-	<section></section>
+	<section class="bg-primary">
+		<img src={umakBg} alt="UMak" class="object-cover h-full w-full opacity-20" />
+	</section>
 </div>

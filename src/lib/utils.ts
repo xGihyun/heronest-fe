@@ -74,3 +74,10 @@ export function downloadFile(blob: Blob, fileName: string) {
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
 }
+
+export async function downloadFileFromUrl(fileUrl: string, fileName: string) {
+	const response = await fetch(fileUrl);
+	const blob = await response.blob();
+
+	downloadFile(blob, fileName);
+}

@@ -2,7 +2,7 @@ import { renderComponent } from "$lib/components/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./data-table-actions.svelte";
 import type { User } from "$lib/user/types";
-import UserLink from "./user-link.svelte"
+import UserLink from "./user-link.svelte";
 
 export const columns: ColumnDef<User>[] = [
 	{
@@ -17,7 +17,10 @@ export const columns: ColumnDef<User>[] = [
 	},
 	{
 		accessorKey: "role",
-		header: "Role"
+		header: "Role",
+		accessorFn(user) {
+			return String(user.role).charAt(0).toUpperCase() + String(user.role).slice(1);
+		}
 	},
 	{
 		id: "actions",

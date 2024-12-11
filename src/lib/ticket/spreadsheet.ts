@@ -5,6 +5,8 @@ import type { Event } from "$lib/map/event/types";
 import type { Ticket } from "./types";
 import { downloadFile } from "$lib/utils";
 import { format } from "date-fns";
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
+import type { ApiResponse } from "$lib/api/types";
 
 export async function generateTicketsCsv(tickets: Ticket[], event?: Event) {
 	const workbook = new ExcelJS.Workbook();
@@ -59,4 +61,20 @@ export async function generateTicketsCsv(tickets: Ticket[], event?: Event) {
 		: `Reservations - ${currentDate}.csv`;
 
 	downloadFile(blob, fileName);
+}
+
+type TicketBatchPath = string;
+
+export async function getTicketBatches(
+	eventId: string
+): Promise<ApiResponse<TicketBatchPath>> {
+	const response = await fetch(
+		`${PUBLIC_BACKEND_URL}/api/ticket-batch?eventId=${eventId}`,
+		{
+			method: "GET"
+		}
+	);
+	const result: ApiResponse<TicketBatchPath> = await response.json();
+
+	return result;
 }

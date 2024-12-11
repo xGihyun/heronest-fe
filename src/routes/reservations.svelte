@@ -20,7 +20,7 @@
 	});
 </script>
 
-<h1 class="mb-1 font-inter-bold text-2xl">Reservations</h1>
+<h1 class="mb-2 font-inter-bold text-3xl">Reservations</h1>
 
 <div class="rounded-md border bg-card">
 	<Table.Root>

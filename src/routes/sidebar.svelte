@@ -4,7 +4,13 @@
 	import * as Sidebar from "$lib/components/ui/sidebar";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-	import { EventIcon, HomeIcon, LocationIcon, UsersIcon } from "$lib/icons";
+	import {
+		EventIcon,
+		HomeIcon,
+		LocationIcon,
+		UsersIcon,
+		WingIcon
+	} from "$lib/icons";
 	import { UserRole, type User } from "$lib/user/types";
 	import type { Component } from "svelte";
 	import type { SVGAttributes } from "svelte/elements";
@@ -66,7 +72,10 @@
 	<Sidebar.Header>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
-				<h1 class="font-inter-bold text-2xl">Heronest</h1>
+				<a href="/" class="flex gap-2 p-2">
+					<WingIcon class="size-6 text-accent" />
+					<h1 class="font-inter-bold text-2xl">Heronest</h1>
+				</a>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Header>
@@ -100,7 +109,7 @@
 										src={props.user.avatar_url}
 										alt={props.user.email}
 									/>
-									<Avatar.Fallback class="bg-background">
+									<Avatar.Fallback class="bg-background text-foreground">
 										{getUserInitials(props.user)}
 									</Avatar.Fallback>
 								</Avatar.Root>

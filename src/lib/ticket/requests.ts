@@ -36,7 +36,7 @@ export async function getTickets(
 			params.set("eventId", String(filter.eventId));
 		}
 		if (filter.userId) {
-			params.set("eventId", String(filter.eventId));
+			params.set("userId", String(filter.userId));
 		}
 	}
 

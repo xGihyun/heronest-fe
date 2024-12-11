@@ -22,9 +22,9 @@ const config: Config = {
 		},
 		extend: {
 			boxShadow: {
-				"map": "0 0px 30px 28px rgba(229,229,229, 1)",
-				"map-bottom": "0 8px 30px 28px rgba(229,229,229, 1)",
-				"map-top": "0 8px 30px 28px rgba(229,229,229, 1)"
+				"map-left": "0 0px 30px 28px rgba(235, 237, 250, 1)",
+				"map-bottom": "0 8px 30px 28px rgba(235, 237, 250, 1)",
+				"map-top": "0 8px 30px 28px rgba(235, 237, 250, 1)"
 			},
 			colors: {
 				border: "hsl(var(--border) / <alpha-value>)",
@@ -69,7 +69,10 @@ const config: Config = {
 					"accent-foreground": "hsl(var(--sidebar-accent-foreground))",
 					border: "hsl(var(--sidebar-border))",
 					ring: "hsl(var(--sidebar-ring))"
-				}
+				},
+                map: {
+                    DEFAULT: "hsl(231 41% 85%)"
+                }
 			},
 			borderRadius: {
 				xl: "calc(var(--radius) + 4px)",
