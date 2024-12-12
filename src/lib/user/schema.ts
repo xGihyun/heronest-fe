@@ -17,6 +17,8 @@ export const RegisterSchema = v.object({
 	sex: v.enum(UserSex)
 });
 
+export type RegisterOutput = v.InferOutput<typeof RegisterSchema>;
+
 export const CreateUserSchema = v.object({
 	user_id: v.optional(v.string()),
 	email: v.pipe(v.string(), v.email()),
@@ -33,5 +35,4 @@ export const CreateUserSchema = v.object({
 	sex: v.enum(UserSex)
 });
 
-export type RegisterOutput = v.InferOutput<typeof RegisterSchema>;
 export type CreateUserOutput = v.InferOutput<typeof CreateUserSchema>;

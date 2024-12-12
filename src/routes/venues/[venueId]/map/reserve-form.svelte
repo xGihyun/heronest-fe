@@ -10,7 +10,7 @@
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { toast } from "svelte-sonner";
-	import type { ApiResponse } from "$lib/api/types";
+	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 	import type { Event } from "$lib/map/event/types";
 	import type { Seat } from "$lib/map/seat/types";
 	import { UserRole, type User } from "$lib/user/types";
@@ -35,7 +35,12 @@
 		onResult: (event) => {
 			if (event.result.type === "success") {
 				const result: ApiResponse = event.result.data?.result;
-				toast.success(result.message || "Success.", { id: toastId });
+
+				if (result.status !== ApiResponseStatus.Success) {
+					toast.error(result.message, { id: toastId });
+					return;
+				}
+				toast.success(result.message, { id: toastId });
 			}
 		},
 		resetForm: false
@@ -105,7 +110,8 @@
 	</Form.Field>
 
 	<Form.Button
-		disabled={authContext.user.role === UserRole.Visitor && !selectedEvent?.allow_visitors}
+		disabled={authContext.user?.role === UserRole.Visitor &&
+			!selectedEvent?.allow_visitors}
 	>
 		Reserve
 	</Form.Button>
