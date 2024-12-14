@@ -358,6 +358,7 @@
 							seat={selectedSeat.seat}
 							events={data.events}
 							user={data.user!}
+                            eventId={data.eventId}
 						/>
 					{/if}
 				{/if}

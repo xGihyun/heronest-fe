@@ -21,6 +21,7 @@
 		events: Event[];
 		seat: Seat;
 		user: User;
+        eventId: string | null
 	};
 
 	let props: Props = $props();
@@ -41,6 +42,8 @@
 					return;
 				}
 				toast.success(result.message, { id: toastId });
+			} else {
+				toast.error("Failed to reserve seat.", { id: toastId });
 			}
 		},
 		resetForm: false
@@ -51,7 +54,8 @@
 	$formData = {
 		...$formData,
 		seat_id: props.seat.seat_id,
-		user_id: props.user.user_id
+		user_id: props.user.user_id,
+        event_id: props.eventId || props.events[0]
 	};
 
 	const eventTriggerContent = $derived(
