@@ -3,29 +3,41 @@
 	import "../app.css";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import AppSidebar from "./sidebar.svelte";
-	import { setUserContext } from "$lib/user/context";
+	import {
+		getAuthContext,
+		setAuthContext
+	} from "$lib/user/auth/context.svelte";
 
 	let { data, children } = $props();
 
-	// TODO: Handle `null` value
+	setAuthContext({
+		user: data.user,
+		session: data.session
+	});
 
-	if (data.user) {
-		setUserContext(data.user);
-	}
+	const authContext = getAuthContext();
 </script>
 
 <Toaster closeButton richColors />
 
-<Sidebar.Provider>
-	{#if data.user}
-		<AppSidebar />
-	{/if}
-	<main class="flex min-h-svh w-full flex-col">
-		{#if data.user}
-			<Sidebar.Trigger />
-		{/if}
-		<div class="h-full w-full px-5 py-5">
+{#if authContext.user}
+	<Sidebar.Provider>
+		<AppSidebar user={authContext.user} />
+
+		<div class="flex w-full flex-col">
+			<header class="p-5">
+				<Sidebar.Trigger />
+			</header>
+
+			<main>
+				{@render children()}
+			</main>
+		</div>
+	</Sidebar.Provider>
+{:else}
+	<main class="h-svh">
+		<div class="h-full w-full">
 			{@render children()}
 		</div>
 	</main>
-</Sidebar.Provider>
+{/if}

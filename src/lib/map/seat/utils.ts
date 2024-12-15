@@ -1,9 +1,9 @@
 import { Rect } from "konva/lib/shapes/Rect";
 import { parseTransform } from "../utils";
-import { SeatStatus, type Seat } from "./types";
+import { type Seat } from "./types";
 import { selectedSeat } from "../../../routes/venues/[venueId]/map/state.svelte";
 import { SEAT_COLOR } from "./constants";
-import type { User } from "$lib/user/types";
+import { UserRole, type User } from "$lib/user/types";
 
 export function createSeatFromSvg(rect: SVGRectElement): Rect {
 	let x = parseFloat(rect.getAttribute("x") || "0");
@@ -34,7 +34,7 @@ export function createSeatFromSvg(rect: SVGRectElement): Rect {
 		y: y,
 		width: width,
 		height: height,
-		fill: SEAT_COLOR[SeatStatus.Unavailable],
+		fill: SEAT_COLOR.available,
 		rotation: rotation,
 		scaleX: scaleX,
 		scaleY: scaleY,
@@ -50,7 +50,13 @@ export function setupEventListeners(
 	seat: Seat,
 	mapContainer: HTMLDivElement,
 	user: User
-) {
+): void {
+	const canInteract = !seat.reservation || user.role === UserRole.Admin;
+
+	if (!canInteract) {
+		return;
+	}
+
 	rect.on("click", () => {
 		selectedSeat.seat = seat;
 		selectedSeat.rect = rect;
@@ -76,11 +82,11 @@ export function setupEventListeners(
 
 export function seatFillColor(seat: Seat, rect: Rect, currentUser: User): void {
 	if (
-		seat.reserved_by &&
-		seat.reserved_by.user.user_id === currentUser.user_id
+		seat.reservation &&
+		seat.reservation.user.user_id === currentUser.user_id
 	) {
 		rect.fill(SEAT_COLOR.reserved_current_user);
-	} else if (seat.reserved_by) {
+	} else if (seat.reservation) {
 		rect.fill(SEAT_COLOR.reserved);
 	} else {
 		rect.fill(SEAT_COLOR.available);

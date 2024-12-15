@@ -4,6 +4,7 @@ import type { CreateEventOutput } from "./schema";
 export type Event = {
 	event_id: string;
 	venue: Venue;
+    total_reservation: number;
 } & Omit<CreateEventOutput, "venue_id" | "image">;
 
 export type EventBriefDetail = {

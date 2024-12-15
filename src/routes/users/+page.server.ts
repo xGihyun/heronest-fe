@@ -1,6 +1,6 @@
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import type { ApiResponse } from "$lib/api/types";
-import { fail, superValidate } from "sveltekit-superforms";
+import { fail, message, superValidate } from "sveltekit-superforms";
 import type { PageServerLoad } from "./$types";
 import { valibot } from "sveltekit-superforms/adapters";
 import { CreateUserSchema } from "$lib/user/schema";
@@ -65,9 +65,8 @@ export const actions: Actions = {
 
 		const result: ApiResponse = await response.json();
 
-		return {
-			form,
-			result
-		};
+        console.log("Create User:", result)
+
+		return message(form, result);
 	}
 };

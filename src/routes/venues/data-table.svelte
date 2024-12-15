@@ -24,7 +24,7 @@
 	});
 </script>
 
-<div class="rounded-md border">
+<div class="rounded-md border bg-card">
 	<Table.Root>
 		<Table.Header>
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

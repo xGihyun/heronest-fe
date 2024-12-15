@@ -43,7 +43,7 @@
 	}
 </script>
 
-<form method="POST" {action} use:enhance>
+<form method="POST" {action} use:enhance class="space-y-4">
 	<Form.Field {form} name="venue_id" hidden>
 		<Form.Control>
 			{#snippet children({ props })}
@@ -83,16 +83,6 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="capacity">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Capacity</Form.Label>
-				<Input {...props} bind:value={$formData.capacity} type="number" />
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
     <!-- TODO: Add this! -->
 	<Form.Field {form} name="image_url" hidden>
 		<Form.Control>
@@ -104,5 +94,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<Form.Button class="w-full">Submit</Form.Button>
 </form>

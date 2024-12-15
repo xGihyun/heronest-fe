@@ -9,14 +9,13 @@
 		superForm
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
-	import { type ReservedTicketDetail, type Seat } from "$lib/map/seat/types";
+	import { type Seat, type SeatReservation } from "$lib/map/seat/types";
 	import type { Event } from "$lib/map/event/types";
 	import { toast } from "svelte-sonner";
 	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 	import type { User } from "$lib/user/types";
 	import { formatUserName } from "$lib/user/utils";
 	import * as Command from "$lib/components/ui/command/index.js";
-	import { SEAT_STATUS_OPTIONS } from "$lib/map/seat/constants";
 	import { Button } from "$lib/components/ui/button";
 
 	type Props = {
@@ -63,31 +62,24 @@
 	$formData = {
 		seat_id: props.seat.seat_id,
 		seat_number: props.seat.seat_number,
-		status: props.seat.status,
 		venue_id: props.venueId,
 		metadata: props.seat.metadata,
 		seat_section_id: props.seat.seat_section_id || null,
-		reserved_by: {
-			seat_id: props.seat.seat_id,
-			metadata: null,
-			user_id: props.seat.reserved_by?.user.user_id || "",
-			event_id: props.seat.reserved_by?.event.event_id || props.eventId
+		reservation: {
+			user_id: props.seat.reservation?.user.user_id || "",
+			event_id: props.seat.reservation?.event.event_id || props.eventId
 		}
 	};
 
-	const seatStatusTriggerContent = $derived(
-		SEAT_STATUS_OPTIONS.find((s) => s.value === $formData.status)?.label ??
-			"Select a status"
-	);
 	const eventTriggerContent = $derived(
-		props.events.find((e) => e.event_id === $formData.reserved_by.event_id)
+		props.events.find((e) => e.event_id === $formData.reservation.event_id)
 			?.name ?? "Select an event"
 	);
 	const userTriggerContent = $derived(getUserTriggerContent());
 
 	function getUserTriggerContent(): string {
 		const user = props.users.find(
-			(u) => u.user_id === $formData.reserved_by.user_id
+			(u) => u.user_id === $formData.reservation.user_id
 		);
 
 		if (!user) {
@@ -98,7 +90,7 @@
 	}
 
 	async function generateTicketFile(
-		ticket: ReservedTicketDetail
+		ticket: SeatReservation
 	): Promise<void> {
 		let toastId = toast.loading("Generating ticket...");
 
@@ -169,49 +161,15 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="status" hidden>
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Status</Form.Label>
-				<Select.Root
-					type="single"
-					bind:value={$formData.status}
-					name={props.name}
-				>
-					<Select.Trigger {...props}>
-						{seatStatusTriggerContent}
-					</Select.Trigger>
-					<Select.Content>
-						{#each SEAT_STATUS_OPTIONS as status (status.value)}
-							<Select.Item value={status.value} label={status.label}
-							></Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
 	<h2 class="font-inter-semibold">Reserved By</h2>
 
-	<Form.Field {form} name="reserved_by.metadata" hidden>
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Metadata</Form.Label>
-				<Input {...props} bind:value={$formData.reserved_by.metadata} />
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
-	<Form.Field {form} name="reserved_by.user_id">
+	<Form.Field {form} name="reservation.user_id">
 		<Form.Control>
 			{#snippet children({ props: childProps })}
 				<Form.Label>User</Form.Label>
 				<Select.Root
 					type="single"
-					bind:value={$formData.reserved_by.user_id}
+					bind:value={$formData.reservation.user_id}
 					name={childProps.name}
 				>
 					<Select.Trigger {...childProps}>
@@ -242,23 +200,13 @@
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Field {form} name="reserved_by.seat_id" hidden>
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Seat Id</Form.Label>
-				<Input {...props} bind:value={$formData.reserved_by.seat_id} />
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
-	<Form.Field {form} name="reserved_by.event_id">
+	<Form.Field {form} name="reservation.event_id">
 		<Form.Control>
 			{#snippet children({ props: childProps })}
 				<Form.Label>Event</Form.Label>
 				<Select.Root
 					type="single"
-					bind:value={$formData.reserved_by.event_id}
+					bind:value={$formData.reservation.event_id}
 					name={childProps.name}
 				>
 					<Select.Trigger {...childProps}>
@@ -276,13 +224,13 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if props.seat.reserved_by}
+	{#if props.seat.reservation}
 		<Button
 			onclick={() => {
-				if (!props.seat.reserved_by) {
+				if (!props.seat.reservation) {
 					return;
 				}
-				generateTicketFile(props.seat.reserved_by?.ticket);
+				generateTicketFile(props.seat.reservation);
 			}}
 		>
 			Generate Ticket

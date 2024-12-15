@@ -8,10 +8,10 @@ export type ApiResponse<T = unknown> = {
 	status: ApiResponseStatus;
 	data: T;
 	status_code: number;
-	message?: string;
+	message: string;
 };
 
-export type PaginationResult = {
+export type PaginationQuery = {
 	page?: number | string ;
 	limit?: number | string ;
 };

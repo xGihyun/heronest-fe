@@ -5,7 +5,8 @@
 	import {
 		type SuperValidated,
 		type Infer,
-		superForm
+		superForm,
+		setError
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { UserRole, UserSex } from "$lib/user/types";
@@ -14,34 +15,65 @@
 	import { RegisterSchema } from "$lib/user/schema";
 	import { DateTimeInput } from "$lib/components/ui/date-time-input";
 	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
+	import { goto } from "$app/navigation";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof RegisterSchema>>;
 	};
 
 	let props: Props = $props();
-
 	let toastId: number | string;
 
 	const form = superForm(props.form, {
 		validators: valibotClient(RegisterSchema),
-		onSubmit: () => {
-			toastId = toast.loading("Submitting...");
+		onSubmit() {
+			toastId = toast.loading("Registering...");
 		},
-		onResult: (event) => {
-			if (event.result.type === "success") {
-				const result: ApiResponse = event.result.data?.result;
-
-				if (result.status !== ApiResponseStatus.Success) {
-					toast.error(result.message || "Failed to register.", { id: toastId });
-					return;
-				}
-
-				toast.success(result.message || "Successfully registered.", {
-					id: toastId
-				});
+		onResult(event) {
+			if (event.result.type !== "success") {
+				console.error("Unexpected result after registration:", event.result);
+				toast.error("Unexpected result after registration.", { id: toastId });
+				return;
 			}
-		}
+		},
+		onUpdate(event) {
+			const isStudentEmail = event.form.data.email.endsWith("@umak.edu.ph");
+			if (!isStudentEmail && event.form.data.role === UserRole.Student) {
+				setError(
+					event.form,
+					"email",
+					"Only students with UMak emails are accepted."
+				);
+			}
+
+			if (event.form.data.birth_date > new Date()) {
+				setError(
+					event.form,
+					"birth_date",
+					"The maximum birth date is the current date."
+				);
+			}
+		},
+		async onUpdated(event) {
+			if (!event.form.valid) {
+				toast.error("Invalid form data.", { id: toastId });
+				return;
+			}
+
+			const result: ApiResponse = event.form.message;
+
+			if (result.status !== ApiResponseStatus.Success) {
+				toast.error(result.message, { id: toastId });
+				return;
+			}
+
+			toast.success(result.message, {
+				id: toastId
+			});
+
+			await goto("/login");
+		},
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
@@ -185,5 +217,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<Form.Button class="w-full">Register</Form.Button>
 </form>

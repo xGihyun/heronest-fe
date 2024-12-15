@@ -10,18 +10,18 @@
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { toast } from "svelte-sonner";
-	import type { ApiResponse } from "$lib/api/types";
+	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
 	import type { Event } from "$lib/map/event/types";
 	import type { Seat } from "$lib/map/seat/types";
 	import { UserRole, type User } from "$lib/user/types";
-	import { getUserContext } from "$lib/user/context";
-	import { _getVisibleLeafColumns } from "@tanstack/table-core";
+	import { getAuthContext } from "$lib/user/auth/context.svelte";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof CreateTicketSchema>>;
 		events: Event[];
 		seat: Seat;
 		user: User;
+        eventId: string | null
 	};
 
 	let props: Props = $props();
@@ -36,7 +36,14 @@
 		onResult: (event) => {
 			if (event.result.type === "success") {
 				const result: ApiResponse = event.result.data?.result;
-				toast.success(result.message || "Success.", { id: toastId });
+
+				if (result.status !== ApiResponseStatus.Success) {
+					toast.error(result.message, { id: toastId });
+					return;
+				}
+				toast.success(result.message, { id: toastId });
+			} else {
+				toast.error("Failed to reserve seat.", { id: toastId });
 			}
 		},
 		resetForm: false
@@ -47,7 +54,8 @@
 	$formData = {
 		...$formData,
 		seat_id: props.seat.seat_id,
-		user_id: props.user.user_id
+		user_id: props.user.user_id,
+        event_id: props.eventId || props.events[0]
 	};
 
 	const eventTriggerContent = $derived(
@@ -59,7 +67,7 @@
 		props.events.find((e) => e.event_id === $formData.event_id)
 	);
 
-	const user = getUserContext();
+	const authContext = getAuthContext();
 </script>
 
 <form method="POST" action="?/reserveSeat" class="space-y-4" use:enhance>
@@ -106,7 +114,8 @@
 	</Form.Field>
 
 	<Form.Button
-		disabled={user.role === UserRole.Visitor && !selectedEvent?.allow_visitors}
+		disabled={authContext.user?.role === UserRole.Visitor &&
+			!selectedEvent?.allow_visitors}
 	>
 		Reserve
 	</Form.Button>

@@ -21,6 +21,8 @@ import FileImportIcon from "virtual:icons/mingcute/file-import-fill";
 
 import EditIcon from "virtual:icons/lucide/edit"
 
+import WingIcon from "virtual:icons/game-icons/curly-wing"
+
 export {
 	LocationIcon,
 	ArrowDownDropIcon,
@@ -38,5 +40,6 @@ export {
     SearchIcon,
     EditIcon,
     FileDownloadIcon,
-    ChevronRightIcon
+    ChevronRightIcon,
+    WingIcon
 };

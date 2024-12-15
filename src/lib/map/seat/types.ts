@@ -2,11 +2,11 @@ import type { UserBriefDetail } from "$lib/user/types";
 import type { EventBriefDetail } from "../event/types";
 import type { VenueBriefDetail } from "../venue/types";
 
-export enum SeatStatus {
-	Reserved = "reserved",
-	Available = "available",
-	Unavailable = "unavailable"
-}
+//export enum SeatStatus {
+//	Reserved = "reserved",
+//	Available = "available",
+//	Unavailable = "unavailable"
+//}
 
 export type Seat = {
 	seat_id: string;

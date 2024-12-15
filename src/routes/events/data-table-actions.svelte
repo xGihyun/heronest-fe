@@ -6,8 +6,15 @@
 	import { getFormState } from "./state.svelte";
 	import { FormAction } from "$lib/types";
 	import { EditIcon, FileDownloadIcon } from "$lib/icons";
-	import { generateTicketsCsv } from "$lib/ticket/spreadsheet";
+	import {
+		generateTicketsCsv,
+		getTicketBatches
+	} from "$lib/ticket/spreadsheet";
 	import { getTickets } from "$lib/ticket/requests";
+	import { ApiResponseStatus } from "$lib/api/types";
+	import { downloadFileFromUrl } from "$lib/utils";
+	import { format } from "date-fns";
+	import { toast } from "svelte-sonner";
 
 	type Props = {
 		event: Event;
@@ -20,9 +27,35 @@
 	async function getReservationReportByEvent(event: Event) {
 		const tickets = await getTickets({ eventId: event.event_id });
 
-        console.log(tickets)
-
 		await generateTicketsCsv(tickets.data, event);
+	}
+
+	async function generateBatches() {
+		let toastId: string | number = toast.loading(
+			"Generating ticket batches..."
+		);
+		const batches = await getTicketBatches(props.event.event_id);
+
+		console.log(batches);
+
+		if (batches.status !== ApiResponseStatus.Success) {
+			console.error(batches.message);
+			toast.error(batches.message, { id: toastId });
+			return;
+		}
+
+		try {
+			const currentDate = format(new Date(), "yyyy-MM-dd - hh:mma");
+			const fileName = `${props.event.name} - Tickets - ${currentDate}.zip`;
+			await downloadFileFromUrl(
+				`/storage/tickets/batches/${batches.data}`,
+				fileName
+			);
+
+			toast.success("Successfully generated ticket batches.", { id: toastId });
+		} catch (error) {
+			console.error("Failed to generate ticket batches:", error);
+		}
 	}
 </script>
 
@@ -62,9 +95,15 @@
 			Edit
 		</DropdownMenu.Item>
 
+		<DropdownMenu.Separator />
+
 		<DropdownMenu.Item onclick={() => getReservationReportByEvent(props.event)}>
 			<FileDownloadIcon class="size-4" />
 			Reservations
+		</DropdownMenu.Item>
+		<DropdownMenu.Item onclick={generateBatches}>
+			<FileDownloadIcon class="size-4" />
+			Tickets
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

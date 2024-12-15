@@ -9,37 +9,50 @@
 	} from "sveltekit-superforms";
 	import { valibotClient } from "sveltekit-superforms/adapters";
 	import { toast } from "svelte-sonner";
-	import type { ApiResponse } from "$lib/api/types";
+	import { ApiResponseStatus, type ApiResponse } from "$lib/api/types";
+	import { getAuthContext } from "$lib/user/auth/context.svelte";
+	import type { User } from "$lib/user/types";
+	import { goto } from "$app/navigation";
 
 	type Props = {
 		form: SuperValidated<Infer<typeof LoginSchema>>;
 	};
 
 	let props: Props = $props();
-
 	let toastId: number | string;
+	const authContext = getAuthContext();
 
 	const form = superForm(props.form, {
 		validators: valibotClient(LoginSchema),
-		onSubmit: () => {
-			toastId = toast.loading("Submitting...");
+		onSubmit() {
+			toastId = toast.loading("Logging in...");
 		},
-		onResult: (event) => {
-			if (event.result.type === "redirect") {
-				toast.success("Successfully logged in.", { id: toastId });
+		onResult(event) {
+			if (event.result.type !== "success") {
+				console.error("Unexpected result after login: ", event.result);
+				toast.error("Unexpected result after login.", { id: toastId });
+				return;
+			}
+		},
+		async onUpdated(event) {
+			if (!event.form.valid) {
+				toast.error("Invalid form data.", { id: toastId });
 				return;
 			}
 
-			if (event.result.type === "success") {
-				const result: ApiResponse = event.result.data?.result;
+			const result: ApiResponse<User> = event.form.message;
 
-				toast.error(result.message || "Error during login.", { id: toastId });
-                return
+			if (result.status !== ApiResponseStatus.Success) {
+				toast.error(result.message, { id: toastId });
+				return;
 			}
 
-			console.debug("Unexpected result type: " + event.result.type);
+			authContext.user = result.data;
+			toast.success(result.message, { id: toastId });
+
+			await goto("/");
 		},
-        resetForm: false
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
@@ -66,5 +79,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<Form.Button class="w-full">Login</Form.Button>
 </form>

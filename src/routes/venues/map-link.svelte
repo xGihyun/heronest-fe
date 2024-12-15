@@ -11,7 +11,7 @@
 
 <a
 	href={`/venues/${props.venue.venue_id}/map`}
-	class="flex items-center gap-2 font-inter-semibold text-blue-800 underline"
+	class="flex items-center gap-2 font-inter-semibold text-primary underline"
 >
 	<LocationIcon class="size-4" />
 	{props.venue.name}

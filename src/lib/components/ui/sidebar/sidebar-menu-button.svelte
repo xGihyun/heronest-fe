@@ -6,7 +6,7 @@
 				hover:text-sidebar-accent-foreground active:bg-sidebar-accent
 				active:text-sidebar-accent-foreground
 				data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate
-				[&>svg]:data-[active=true]:text-accent transition-all
+				[&>svg]:data-[active=true]:text-sidebar-accent transition-all
                 duration-300
 				`,
 		variants: {

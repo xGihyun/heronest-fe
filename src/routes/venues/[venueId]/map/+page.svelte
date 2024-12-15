@@ -19,7 +19,7 @@
 	import { handleSave } from "$lib/map/seat/handlers";
 	import { toast } from "svelte-sonner";
 	import { ApiResponseStatus } from "$lib/api/types";
-	import { SeatStatus, type Seat } from "$lib/map/seat/types.js";
+	import { type Seat } from "$lib/map/seat/types.js";
 	import { v4 as uuidv4 } from "uuid";
 	import { seatFillColor, setupEventListeners } from "$lib/map/seat/utils.js";
 	import { selectedSeat } from "./state.svelte.js";
@@ -27,6 +27,7 @@
 	import SeatForm from "./seat-form.svelte";
 	import { UserRole } from "$lib/user/types.js";
 	import ReserveForm from "./reserve-form.svelte";
+	import { Progress } from "$lib/components/ui/progress/index.js";
 
 	let { data } = $props();
 
@@ -39,7 +40,7 @@
 
 	let seats = $derived(data.seats);
 
-	let svgInput: HTMLInputElement | undefined;
+	let svgInput: HTMLInputElement | undefined = $state();
 
 	$effect(() => {
 		if (!mapContainer) {
@@ -67,8 +68,8 @@
 		for (const seat of seats) {
 			const rect: Konva.Rect = Konva.Node.create(seat.metadata);
 
-			seatFillColor(seat, rect, data.user);
-			setupEventListeners(rect, seat, mapContainer, data.user);
+			seatFillColor(seat, rect, data.user!);
+			setupEventListeners(rect, seat, mapContainer, data.user!);
 			seatsGroup.add(rect);
 		}
 
@@ -87,14 +88,18 @@
 		const result = await handleSave(seats, data.venueId);
 
 		if (result.status !== ApiResponseStatus.Success) {
-			toast.error(result.message || "Error.", { id: toastId });
+			toast.error(result.message, { id: toastId });
 			return;
 		}
 
-		toast.success(result.message || "Success", { id: toastId });
+		toast.success(result.message, { id: toastId });
 	}
 
 	let selectedEventId = $state(data.eventId);
+
+	const selectedEvent = $derived(
+		data.events.find((e) => e.event_id === selectedEventId)
+	);
 
 	const eventTriggerContent = $derived(
 		data.events.find((e) => e.event_id === selectedEventId)?.name ??
@@ -105,16 +110,18 @@
 <div class="flex h-full w-full overflow-clip">
 	<div class="relative h-full flex-1">
 		<div
-			class="absolute left-0 top-0 z-[11] flex h-20
-            w-full items-center gap-2 bg-neutral-200 text-foreground shadow-map-bottom"
+			class="absolute left-0 top-0 z-[11] flex h-20 w-full items-center gap-60 bg-background text-foreground shadow-map-bottom"
 		>
-			<LocationIcon class="size-12" />
-			<div>
-				<p class="font-inter-semibold">Venue</p>
-				<p class="font-inter-semibold text-lg text-foreground/60">
-					{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
-				</p>
+			<div class="flex gap-2">
+				<LocationIcon class="size-12" />
+				<div>
+					<p class="font-inter-semibold">Venue</p>
+					<p class="font-inter-semibold text-lg text-foreground/60">
+						{data.venues.find((venue) => venue.venue_id === data.venueId)?.name}
+					</p>
+				</div>
 			</div>
+
 		</div>
 
 		<Select.Root type="single" bind:value={selectedEventId}>
@@ -122,8 +129,7 @@
 				{#snippet child({ props: triggerProps })}
 					<button
 						{...triggerProps}
-						class="absolute left-2 top-32 z-[11] flex w-full max-w-72 items-center justify-between gap-2
-                        rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
+						class="absolute left-2 top-32 z-[11] flex w-full max-w-72 items-center justify-between gap-2 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
 					>
 						<div class="flex items-center gap-2">
 							<EventIcon class="size-6 text-accent" />
@@ -160,21 +166,49 @@
 
 		<div
 			bind:this={mapContainer}
-			class="relative z-10 h-full w-full bg-neutral-200"
+			class="relative z-10 h-full w-full bg-map"
 		></div>
 
+			{#if selectedEvent}
+				<div class="w-80 space-y-1 absolute right-12 top-32 z-[11] bg-background rounded-full px-3 py-2 shadow">
+					<Progress
+						value={selectedEvent.total_reservation}
+						max={selectedEvent.venue.capacity}
+						class="h-1 w-full"
+					/>
+
+					<p class="flex justify-between text-sm text-primary">
+						Reservations
+						<span>
+							({selectedEvent.total_reservation} / {selectedEvent.venue
+								.capacity})
+						</span>
+					</p>
+				</div>
+			{/if}
+
 		<div
-			class="absolute bottom-0 left-0 z-[11] h-20 w-full bg-neutral-200
-            text-foreground shadow-map-top"
+			class="absolute bottom-0 left-0 z-[11] h-20 w-full bg-background text-foreground shadow-map-top"
 		>
+			<div class="absolute bottom-0 left-10 z-10 flex flex-col gap-2">
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-[#f8bd3f]"></span>
+					<p class="text-sm">Your Reservation</p>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-accent"></span>
+					<p class="text-sm">Reserved</p>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<span class="size-3 bg-[#888888]"></span>
+					<p class="text-sm">Available</p>
+				</div>
+			</div>
+
 			<div
-				class="absolute bottom-10 left-1/2
-                z-10 flex w-full max-w-96 -translate-x-1/2
-                cursor-pointer
-                items-center gap-2 space-x-4 rounded-full border-2
-                border-neutral-400/85 bg-neutral-900/85 px-3
-                py-2 text-background
-                shadow"
+				class="absolute bottom-10 left-1/2 z-10 flex w-full max-w-96 -translate-x-1/2 cursor-pointer items-center gap-2 space-x-4 rounded-full border-2 border-neutral-400/85 bg-neutral-900/85 px-3 py-2 text-background shadow"
 			>
 				<Button
 					class="h-auto rounded-full p-1"
@@ -254,14 +288,13 @@
 
 								const seat: Seat = {
 									seat_id: uuidv4(),
-									status: SeatStatus.Unavailable,
 									venue_id: data.venueId,
 									metadata: JSON.parse(rect.toJSON()),
 									seat_number: `${i + 1}`
 								};
 
 								seats.push(seat);
-								setupEventListeners(rect, seat, mapContainer, data.user);
+								setupEventListeners(rect, seat, mapContainer, data.user!);
 							});
 						};
 						reader.readAsText(file);
@@ -317,14 +350,15 @@
 							events={data.events}
 							users={data.users}
 							venueId={data.venueId}
-                            eventId={data.eventId}
+							eventId={data.eventId}
 						/>
 					{:else}
 						<ReserveForm
 							form={data.ticketForm}
 							seat={selectedSeat.seat}
 							events={data.events}
-							user={data.user}
+							user={data.user!}
+                            eventId={data.eventId}
 						/>
 					{/if}
 				{/if}
